@@ -1,0 +1,134 @@
+@startuml DiagramaClasesDominio
+skinparam style strictuml
+skinparam linetype ortho
+
+
+class Sesion {
+  usuarioLogueado: Usuario
+}
+
+class Usuario {
+  nombre: String
+  email: String
+  contraseña: String
+}
+
+class Traslado {
+  fechaLlegadaRequerida: Date
+}
+
+class Rol {
+  nombre: String
+}
+
+' --- ENTIDADES DE COMPETICIÓN ---
+
+class Calendario {
+  año: Integer
+}
+
+class FechaGP {
+  fechaInicio: Date
+  fechaFin: Date
+}
+
+class GranPremio {
+  nombre: String
+  orden: Integer
+  
+}
+
+class Campeonato {
+  tipo: String <<Pilotos, Constructores>>
+  año: Integer
+}
+
+class CambioDeEStado {
+  fechaHora: Date
+  estadoAnterior: String
+  estadoNuevo: String
+}
+
+' --- ENTIDADES DE INFRAESTRUCTURA Y UBICACIÓN ---
+
+abstract class Ubicacion {
+}
+
+class Circuito {
+  nombre: String
+  sede: String <<Autódromo, Callejero>>
+  longitudVueltaKm: Real
+  distanciaTotalKm: Real
+  cantidadVueltas: Integer
+  traza: String
+}
+
+class Fabrica {
+    coordenadas: String
+}
+
+class Contrato {
+  añoInicio: Integer
+  añoFin: Integer
+}
+
+' --- ENTIDADES DE PARTICIPANTES ---
+
+class Escuderia {
+  nombre: String
+}
+
+class Piloto {
+  nombre: String
+}
+
+' --- ENTIDADES DE LOGÍSTICA ---
+
+class OrdenTraslado {
+  fechaLlegadaRequerida: Date
+}
+
+class Contenedor {
+  codigoAlfanumerico: String
+  rastreadorGPSActivo: Boolean
+}
+
+class Elemento {
+}
+
+class TipoElemento {
+  nombre: String
+}
+
+class DetalleOrdenTraslado {
+    
+}
+
+
+' --- RELACIONES ---
+
+' Competición
+FechaGP "1" -->  GranPremio : granPremio
+FechaGP "1" --> Circuito : circuito
+
+Sesion "1" --> Usuario : usuario 
+Usuario "1" --> Piloto
+Piloto "1" --> Rol
+
+Escuderia "1...*" --> Piloto
+Escuderia "1" --> Fabrica
+
+Elemento "1" --> TipoElemento
+
+DetalleOrdenTraslado "1" --> Contenedor
+Traslado "0...*" --> Fabrica : fabricaOrigen
+Traslado "0...*" --> Fabrica : fabricaDestino
+Traslado "0...1" --> Circuito : circuitoOrigen
+Traslado "0...1" --> Circuito : circuitoDestino
+Traslado "1...*" --> CambioDeEstado
+CambioDeEstado "1" --> Estado
+
+Contenedor "1" --> Estado
+
+
+@enduml

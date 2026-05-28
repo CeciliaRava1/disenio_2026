@@ -1,0 +1,67 @@
+'Objetivo: Crear una Orden de Traslado para uno o más contenedores de una escudería
+'Flujo: Creación de una Orden de Traslado por un Jefe Mecánico y hay suficientes contenedores disponibles con notificación
+'por email.
+'1. GOT: Selecciona la opción para generar una Orden de Traslado.
+'2. Sistema: Valida si el GOT logueado es Jefe de Equipo y no lo es.
+'3. Sistema: Busca y muestra los circuitos activos de la F1 y la fábrica de la escudería del usuario logueado. (Leer
+'Observación 1). Solicita que se seleccione un origen y un destino para la OT. (Leer la RN 2 Traslados que
+'pueden realizarse con una OT).
+'4. GOT: Selecciona un origen y un destino para el traslado.
+'5. Sistema: Busca y muestra los elementos pertenecientes a la escudería del usuario logueado. Para cada
+'elemento muestra su nombre, código y tipo de elemento. Solicita que se seleccionen todos los elementos a
+'trasladar.
+'6. GOT: Selecciona cada uno de los elementos a trasladar.
+'7. Sistema: Calcula cuántos contenedores se necesitan para los elementos seleccionados. Verifica si hay
+'suficientes contenedores disponibles de la escudería y los hay. (Leer observación 2). Asigna los elementos a un
+'contenedor. (Leer RN 1 Contenedores que provee la FIA).
+'8. Sistema: Solicita que se seleccione la fecha en la que se necesitan los elementos en el destino.
+'9. GOT: Ingresa la fecha en la que se necesitan los elementos en el destino.
+'10. Sistema: Calcula la última fecha de salida posible y valida si es igual o posterior a la fecha actual y lo es. (Leer
+'Observaciones 3 y 7)
+'11. Sistema: Solicita la confirmación de la orden de traslado.
+'12. GOT: Confirma la orden de traslado.
+'13. Sistema: Genera la orden de traslado en estado Creada conteniendo los elementos que se van a trasladar y en
+'qué contenedor se trasladará cada elemento. Actualiza el estado de los contenedores a AsignadoAOrden (Leer
+'Observación 4), la fecha de llegada esperada, la última fecha de salida posible, el origen y destino, la fecha de
+'creación de la orden y el responsable de crearla.
+'14. Sistema: Valida si el Jefe de Equipo tiene formas de notificación activas y solo tiene activa la notificación vía
+'email. Envía un email al Jefe de Equipo indicando que se ha creado una Orden de Traslado que necesita su
+'aprobación, con todos los detalles de la OT. (Leer Observación 5). Fin de Caso de uso.
+
+@startuml
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+actor GOT as ":GOT"
+boundary P as ":PantallaGenerarOT"
+control Gestor as ":GestorGenerarOT"
+entity Sesion as "Activa:Sesion"
+entity Usuario as "Actual:Usuario"
+entity RolGOT as ":GOT"
+entity Calendario as "ColActual:Calendario"
+entity GP as ":GranPremio"
+entity Circuito as ":Circuito"
+entity Estado as ":Estado"
+entity Fabrica as ":FabricaEscuderia"
+entity Elemento as ":Elemento"
+entity TipoElemento as ":TipoElemento"
+entity Contenedor as ":Contenedor"
+entity CambioEstado as ":CambioEstado"
+entity OT as ":OrdenTraslado"
+boundary Email as ":ServicioEmail"
+
+' 1. GOT: Selecciona la opción para generar una Orden de Traslado.
+GOT -> P : opGenerarOT()
+P -> P : habilitarVentana()
+P -> Gestor : opGenerarOT()
+
+
+' 2. Sistema: Valida si el GOT logueado es Jefe de Equipo y no lo es.
+
+
+
+
+
+
+@enduml
