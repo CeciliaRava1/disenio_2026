@@ -1,0 +1,72 @@
+@startuml DiagramaClases
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam shadowing false
+
+' ==========================================
+' CLASES BOUNDARY Y CONTROL
+' ==========================================
+
+
+' ==========================================
+' ENTIDADES DE DOMINIO
+' ==========================================
+class Campo <<Entity>> {
+  + buscarUsuarioLogueado()
+}
+
+class Lote <<Entity>> {
+  - numeroLote: int
+  - superficie: float
+  + h()
+}
+
+class UnidadMedida <<Entity>> {
+  - unidadMedida: String
+}
+
+class TipoPlaga <<Entity>> {
+  + buscarUsuarioLogueado()
+}
+
+class TipoSuelo <<Entity>> {
+  - numeroTipoSuelo: int
+  - nombreTipoSuelo: String
+}
+
+class Cultivo <<Entity>> {
+  - nombreCultivo: String
+}
+
+class MomentoLaboreo <<Entity>> {
+  - ordenMomentoLaboreo: int
+}
+
+class ProyectoCultivo <<Entity>> {
+  + buscarUsuarioLogueado()
+}
+
+class Laboreo <<Entity>> {
+  + buscarUsuarioLogueado()
+}
+
+class Agroquimico <<Entity>> {
+  + buscarUsuarioLogueado()
+}
+
+
+' ==========================================
+' RELACIONES
+' ==========================================
+
+' Relaciones Pantalla - Gestor (Conocimiento mutuo, flechas punteadas)
+'PantSegBolsines <..> GestorSegBolsines
+
+' Relaciones Gestor - Entidades (Conoce a las que llama directamente por flechas punteadas)
+'GestorSegBolsines ..> Sesion
+
+' Relaciones de Dominio (Como el Modelo de Dominio Clásico - Flechas sólidas)
+' Sesion --> "1" Usuario
+
+
+@enduml
