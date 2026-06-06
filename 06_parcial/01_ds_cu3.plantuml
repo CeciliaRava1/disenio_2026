@@ -1,0 +1,125 @@
+@startuml
+
+autonumber
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+actor Cliente as ":Cliente"
+boundary Pantalla as ":PantPagoCuota"
+control Gestor as ":GestorPagoCuota"
+entity Sesion as ":A:Sesion"
+entity Usuario as ":L:Usuario"
+entity Prestamo as ":Prestamo" #ee7829
+
+entity Ps as "S:Prestamo"
+entity CEp as "A:CambioEstadoPrestamo" #ee7829
+entity EstadoPrestamo as ":EstadoPrestamo"
+entity Cuota as ":Cuota" #ee7829
+entity Cs as "S:Cuota"
+entity CEc as ":CambioEstadoCuota"
+entity EstadoCuota as ":EstadoCuota"
+
+participant PagoCuota as ":CURegPagoCuota"
+
+
+
+'1. Cliente selecciona opcion pago una cuota
+Cliente -> Pantalla : opPagoCuota()
+Pantalla -> Pantalla : habilitarVentana()
+Pantalla -> Gestor : opPagoCuota()
+
+'2. Sistema obtiene prestamos activos del cliente logueado y muestra
+'cada uno con su nro, saldo pendiente y cantidad cuotas
+Gestor -> Gestor : buscarClienteLogueado()
+Gestor -> Sesion : obtenerClienteLogueado()
+Sesion -> Usuario : obtenerClienteLogueado()
+
+Gestor -> Gestor : buscarPrestamosActivos()
+
+group Buscar prestamos activos [ Mientras haya prestamos ]
+    Gestor -> Prestamo : obtenerPrestamo()
+    Prestamo -> CEp : esActual()
+    CEp -> EstadoPrestamo : esActivo()
+
+    Gestor -> Prestamo : obtenerNumero()
+    Gestor -> Prestamo : obtenerSaldoPendiente()
+    Gestor -> Prestamo : obtenerCantidadCuotas()
+end
+
+Gestor -> Pantalla : mostrarPrestamosActivos()
+
+'3. Cliente selecciona un prestamo
+Cliente -> Pantalla : tomarSeleccionPrestamo()
+Pantalla -> Gestor : tomarSeleccionPrestamo()
+
+
+'4. Sistema busca y muestra cuotas del prestamo, con su nro, fecha
+' vencimiento y monto base, ordenadas por fecha de vencimiento
+'de forma ascendente
+Gestor -> Gestor : buscarCuotasPrestamo()
+
+group Buscar cuotas prestamo [ Mientras haya cuotas ]
+    Gestor -> Ps : obtenerCuotasPrestamo()
+    Ps -> Cuota : obtenerNroCuota()
+    Ps -> Cuota : obtenerFechaVto()
+    Ps -> Cuota : obtenerMontoBase()
+end
+
+Gestor -> Gestor : ordenarCuotasAsc()
+Gestor -> Pantalla : mostrarCuotas()
+
+'5. Sistema solicita seleccion de la o las cuotas a pagar
+Gestor -> Pantalla : solicitarSeleccionCuotas()
+
+'6. Cliente selecciona una cuota
+Cliente -> Pantalla : tomarSeleccionCuota()
+Pantalla -> Gestor : tomarSeleccionCuota()
+
+'7. Obtiene estado cuota seleccionada y esta en 'programada'
+Gestor -> Gestor : buscarEstadoCuota()
+Gestor -> Cs : obtenerEstadoCuota()
+Cs -> EstadoCuota : esProgramada()
+
+'8. Muestra monto a abonar correspondiente a monto base
+Gestor -> Pantalla : mostrarMontoBase()
+
+'9. Sistema solicita confirmacion al cliente
+Gestor -> Pantalla : solicitarConfirmacionPago()
+
+'10. Cliente confirma pago cuota
+Cliente -> Pantalla : tomarConfirmacionPago()
+Pantalla -> Gestor : tomarConfirmacionPago()
+
+
+'11. Sistema llama CU Registrar pago de cuota, informa ejecucion 
+'exitosa CU
+Gestor --> PagoCuota : new()
+Gestor -> Pantalla : mostrarPagoExitoso()
+
+'12. Sistema actualiza estado cuota a 'pagada', actualiza el saldo
+'pendiente del prestamo
+Gestor -> Gestor : actualizarEstadoCuota()
+Gestor -> Ps : actualizarEstadoCuota()
+Ps -> Cs : actualizarEstadoCuota()
+Cs -> CEc : actualizarEstadoCuota()
+CEc -> EstadoCuota : esPagada()
+
+Gestor -> Gestor : actualizarSaldoPrestamo()
+Gestor -> Ps : actualizarSaldoPendiente()
+
+'13. Para validar si prestamo cambia de estado, busca si el prestamo
+'posee cuotas pendientes de pago y no posee. Actualiza estado de
+'prestamo a 'finalizado'
+Gestor -> Gestor : validarEstadoPrestamo()
+Gestor -> Ps : obtenerCuotas()
+Ps -> Cuota : obtenerCuotas*()
+
+Gestor -> Gestor : actualizarEstadoPrestamo()
+Gestor -> Ps : actualizarEstadoPrestamo()
+Ps -> CEp : actualizarEstadoPrestamo()
+CEp -> EstadoPrestamo : esFinalizado()
+
+
+Gestor -> Gestor : finCU()
+@enduml

@@ -1,0 +1,152 @@
+@startuml DiagramaClasesDominio
+skinparam style strictuml
+skinparam linetype ortho
+
+
+' --- CLASES DE ANALISIS ---
+class PantPagoCuota {
+  - opPagoCuota
+  - prestamosActivos: List
+  - prestamoSeleccionado: Prestamo
+  - cuotas: List
+  - cuotaSeleccionada: Cuota
+  - montoBaseCuota: Float
+
+  + opPagoCuota()
+  + habilitarVentana()
+  + mostrarPrestamosActivos()
+  + tomarSeleccionPrestamo()
+  + mostrarCuotas()
+  + solicitarSeleccionCuotas()
+  + tomarSeleccionCuotas()
+  + mostrarMontoBase()
+  + solicitarConfirmacionPago()
+  + tomarConfirmacionPago()
+  + mostrarPagoExitoso()
+}
+
+class GestorPagoCuota {
+  - clienteLogueado : Usuario
+  - prestamosActivos : List
+  - prestamoSeleccionado : Prestamo
+  - cuotasPrestamo : List
+  - cuotaSeleccionada : Cuota
+  - estadoCuota : String
+  - saldoPrestamo : Float
+  - estadoPrestamo : String
+
+  + opPagoCuota()
+  + buscarClienteLogueado()
+  + buscarPrestamosActivos()
+  + tomarSeleccionPrestamo()
+  + buscarCuotasPrestamo()
+  + ordenarCuotasAsc()  
+  + tomarSeleccionCuota()
+  + buscarEstadoCuota()
+  + tomarConfirmacionPago()
+  + actualizarEstadoCuota()
+  + actualizarSaldoPrestamo()
+  + validarEstadoPrestamo()
+  + actualizarEstadoPrestamo()
+  + finCU()
+}
+
+' --- ENTIDADES ---
+class Cliente {
+  - nombre: String
+  - apellido: String
+  - nroDocumento: String
+  - correoElectronico: Varchar
+  - nroTelefono: String
+}
+
+class Sesion {
+  usuarioLogueado: Usuario
+
+  + obtenerClienteLogueado()
+}
+
+class Usuario {
+  + nombreUsuario : Varchar
+  + clave : Varchar
+
+  + obtenerClienteLogueado()
+}
+
+class Prestamo {
+  - numeroPrestamo: int
+  - saldoPendiente : Float
+  - cantidadCuotas : int
+  - cuotasPrestamo : List
+
+  + obtenerPrestamo()
+  + obtenerNumero()
+  + obtenerSaldoPendiente()
+  + obtenerCantidadCuotas()
+  + obtenerCuotasPrestamo()
+  + actualizarEstadoCuota()
+  + actualizarSaldoPendiente()
+  + actualizarEstadoPrestamo()
+
+}
+
+class CambioEstadoPrestamo {
+  - nombre
+  - descripcion
+
+  + esActual()
+}
+
+class EstadoPrestamo {
+  - nombre
+  - descripcion
+
+  + esActivo()
+  + esFinalizado()
+}
+
+class Cuota {
+  - nroCuota : int
+  - fechaVencimiento : date
+  - montoBase: float
+
+  + obtenerNroCuota()
+  + obtenerFechaVto()
+  + obtenerMontoBase()
+  + obtenerEstadoCuota()
+  + actualizarEstadoCuota()
+  + obtenerCuotas()
+}
+
+class EstadoCuota {
+  - nombre
+  - descripcion
+
+  + esProgramada()
+  + esPagada()
+}
+
+
+' --- RELACIONES ---
+PantPagoCuota <..> GestorPagoCuota
+GestorPagoCuota "1" -> Sesion
+GestorPagoCuota "0...*" -> Prestamo
+GestorPagoCuota "1...*" -> Cuota
+
+Sesion "1" -> Usuario
+Usuario "1" -> Cliente
+Cliente "0...*" --> Prestamo
+
+Prestamo "1...*" --> CambioEstadoPrestamo
+CambioEstadoPrestamo "1" -> EstadoPrestamo
+
+Prestamo "1...*" *-- Cuota
+Cuota "1...*" --> CambioEstadoCuota
+CambioEstadoCuota "1" -> EstadoCuota
+
+
+@enduml
+
+
+' PREGUNTAS
+' Para los atributos, es mejor usar string, o varchar? Nombres, telefono, correo, dni
