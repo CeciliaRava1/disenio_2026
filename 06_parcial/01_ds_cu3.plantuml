@@ -13,11 +13,11 @@ entity Usuario as ":L:Usuario"
 entity Prestamo as ":Prestamo" #ee7829
 
 entity Ps as "S:Prestamo"
-entity CEp as "A:CambioEstadoPrestamo" #ee7829
+entity ACEp as "A:CambioEstadoPrestamo" #ee7829
 entity EstadoPrestamo as ":EstadoPrestamo"
 entity Cuota as ":Cuota" #ee7829
 entity Cs as "S:Cuota"
-entity CEc as ":CambioEstadoCuota"
+entity ACEc as "A:CambioEstadoCuota"
 entity EstadoCuota as ":EstadoCuota"
 
 participant PagoCuota as ":CURegPagoCuota"
@@ -25,9 +25,9 @@ participant PagoCuota as ":CURegPagoCuota"
 
 
 '1. Cliente selecciona opcion pago una cuota
-Cliente -> Pantalla : opPagoCuota()
+Cliente --> Pantalla : opPagoCuota()
 Pantalla -> Pantalla : habilitarVentana()
-Pantalla -> Gestor : opPagoCuota()
+Pantalla --> Gestor : opPagoCuota()
 
 '2. Sistema obtiene prestamos activos del cliente logueado y muestra
 'cada uno con su nro, saldo pendiente y cantidad cuotas
@@ -36,15 +36,16 @@ Gestor -> Sesion : obtenerClienteLogueado()
 Sesion -> Usuario : obtenerClienteLogueado()
 
 Gestor -> Gestor : buscarPrestamosActivos()
+Gestor -> Usuario : obtenerPrestamosActivos()
 
 group Buscar prestamos activos [ Mientras haya prestamos ]
-    Gestor -> Prestamo : obtenerPrestamo()
-    Prestamo -> CEp : esActual()
-    CEp -> EstadoPrestamo : esActivo()
+    Usuario -> Prestamo : obtenerPrestamo()
+    Prestamo -> ACEp : esActual()
+    ACEp -> EstadoPrestamo : esActivo()
 
-    Gestor -> Prestamo : obtenerNumero()
-    Gestor -> Prestamo : obtenerSaldoPendiente()
-    Gestor -> Prestamo : obtenerCantidadCuotas()
+    Usuario -> Prestamo : obtenerNumero()
+    Usuario -> Prestamo : obtenerSaldoPendiente()
+    Usuario -> Prestamo : obtenerCantidadCuotas()
 end
 
 Gestor -> Pantalla : mostrarPrestamosActivos()
@@ -58,9 +59,9 @@ Pantalla -> Gestor : tomarSeleccionPrestamo()
 ' vencimiento y monto base, ordenadas por fecha de vencimiento
 'de forma ascendente
 Gestor -> Gestor : buscarCuotasPrestamo()
+Gestor -> Ps : obtenerCuotasPrestamo()
 
 group Buscar cuotas prestamo [ Mientras haya cuotas ]
-    Gestor -> Ps : obtenerCuotasPrestamo()
     Ps -> Cuota : obtenerNroCuota()
     Ps -> Cuota : obtenerFechaVto()
     Ps -> Cuota : obtenerMontoBase()
@@ -94,17 +95,24 @@ Pantalla -> Gestor : tomarConfirmacionPago()
 
 '11. Sistema llama CU Registrar pago de cuota, informa ejecucion 
 'exitosa CU
-Gestor --> PagoCuota : new()
+Gestor -> Gestor : llamarCUPagoCUota()
+Gestor --> PagoCuota : <<include>>
 Gestor -> Pantalla : mostrarPagoExitoso()
 
 '12. Sistema actualiza estado cuota a 'pagada', actualiza el saldo
 'pendiente del prestamo
+Gestor -> Gestor : buscarEstadoParaAsignar()
+Gestor -> EstadoCuota : esPagada()*
+
 Gestor -> Gestor : actualizarEstadoCuota()
 Gestor -> Ps : actualizarEstadoCuota()
 Ps -> Cs : actualizarEstadoCuota()
-Cs -> CEc : actualizarEstadoCuota()
-CEc -> EstadoCuota : esPagada()
-
+Cs -> Cs : obtenerEstadoActual()
+Cs -> ACEc : setFechaHoraFin()
+Cs -> Cs : crearCambioEstado()
+create entity CEc as "pagada:CambioEstadoCuota"
+Cs --> CEc : new()
+    
 Gestor -> Gestor : actualizarSaldoPrestamo()
 Gestor -> Ps : actualizarSaldoPendiente()
 
@@ -115,11 +123,16 @@ Gestor -> Gestor : validarEstadoPrestamo()
 Gestor -> Ps : obtenerCuotas()
 Ps -> Cuota : obtenerCuotas*()
 
+Gestor -> Gestor : buscarEstadoParaAsignar()
+Gestor -> EstadoPrestamo : esFinalizado()*
 Gestor -> Gestor : actualizarEstadoPrestamo()
-Gestor -> Ps : actualizarEstadoPrestamo()
-Ps -> CEp : actualizarEstadoPrestamo()
-CEp -> EstadoPrestamo : esFinalizado()
 
+Gestor -> Ps : actualizarEstadoPrestamo()
+Ps -> Ps : obtenerEstadoActual()
+Ps -> ACEp : setFechaHoraFin()
+Ps -> Ps : crearCambioEstado()
+create entity CEp as "Finalizado:CambioEstadoPrestamo"
+Ps --> CEp : new()
 
 Gestor -> Gestor : finCU()
 @enduml
