@@ -11,14 +11,19 @@ control Gestor as ":GestorPagoCuota"
 entity Sesion as ":A:Sesion"
 entity Usuario as ":L:Usuario"
 entity Prestamo as ":Prestamo" #ee7829
+entity CEp as ":CambioEstadoPrestamo" #ee7829
+entity ACEp as "A:CambioEstadoPrestamo" 
+entity Ap as "A:EstadoPrestamo" 
+
 
 entity Ps as "S:Prestamo"
-entity ACEp as "A:CambioEstadoPrestamo" #ee7829
 entity EstadoPrestamo as ":EstadoPrestamo"
 entity Cuota as ":Cuota" #ee7829
 entity Cs as "S:Cuota"
-entity ACEc as "A:CambioEstadoCuota"
-entity EstadoCuota as ":EstadoCuota"
+entity CambioEstadoCuota as ":CambioEstadoCuota"
+entity ACambioEstadoCuota as "A:CambioEstadoCuota"
+entity AEstadoCuota as "A:EstadoCuota"
+entity EstadoCuota as "EstadoCuota"
 
 participant PagoCuota as ":CURegPagoCuota"
 
@@ -40,8 +45,9 @@ Gestor -> Usuario : obtenerPrestamosActivos()
 
 group Buscar prestamos activos [ Mientras haya prestamos ]
     Usuario -> Prestamo : obtenerPrestamo()
-    Prestamo -> ACEp : esActual()
-    ACEp -> EstadoPrestamo : esActivo()
+    Prestamo -> CEp : sosActual()*
+    Prestamo -> ACEp : sosActivo()
+    ACEp -> Ap : sosActivo()
 
     Usuario -> Prestamo : obtenerNumero()
     Usuario -> Prestamo : obtenerSaldoPendiente()
@@ -51,6 +57,7 @@ end
 Gestor -> Pantalla : mostrarPrestamosActivos()
 
 '3. Cliente selecciona un prestamo
+Gestor -> Pantalla : solicitarSeleccionPrestamo()
 Cliente -> Pantalla : tomarSeleccionPrestamo()
 Pantalla -> Gestor : tomarSeleccionPrestamo()
 
@@ -80,7 +87,9 @@ Pantalla -> Gestor : tomarSeleccionCuota()
 '7. Obtiene estado cuota seleccionada y esta en 'programada'
 Gestor -> Gestor : buscarEstadoCuota()
 Gestor -> Cs : obtenerEstadoCuota()
-Cs -> EstadoCuota : esProgramada()
+Cs -> CambioEstadoCuota : sosActual()
+Cs -> ACambioEstadoCuota : sosProgramada()
+ACambioEstadoCuota -> AEstadoCuota : sosProgramada()
 
 '8. Muestra monto a abonar correspondiente a monto base
 Gestor -> Pantalla : mostrarMontoBase()
@@ -104,11 +113,12 @@ Gestor -> Pantalla : mostrarPagoExitoso()
 Gestor -> Gestor : buscarEstadoParaAsignar()
 Gestor -> EstadoCuota : esPagada()*
 
+Gestor -> Gestor : obtenerFechaHoraActual()
 Gestor -> Gestor : actualizarEstadoCuota()
 Gestor -> Ps : actualizarEstadoCuota()
 Ps -> Cs : actualizarEstadoCuota()
-Cs -> Cs : obtenerEstadoActual()
-Cs -> ACEc : setFechaHoraFin()
+Cs -> ACambioEstadoCuota : obtenerEstadoActual()
+Cs -> ACambioEstadoCuota : setFechaHoraFin()
 Cs -> Cs : crearCambioEstado()
 create entity CEc as "pagada:CambioEstadoCuota"
 Cs --> CEc : new()
@@ -120,19 +130,26 @@ Gestor -> Ps : actualizarSaldoPendiente()
 'posee cuotas pendientes de pago y no posee. Actualiza estado de
 'prestamo a 'finalizado'
 Gestor -> Gestor : validarEstadoPrestamo()
-Gestor -> Ps : obtenerCuotas()
-Ps -> Cuota : obtenerCuotas*()
+Gestor -> Ps : obtenerCuotasPendientes()
+
+group Buscar cuotas pendientes [ mientras haya cuotas ]
+    Ps -> Cuota : obtenerCuotasPendientes()
+    Cuota -> CambioEstadoCuota : sosActual()
+    Cuota -> ACambioEstadoCuota : sosPendiente()
+    ACambioEstadoCuota -> AEstadoCuota : sosPendiente()
+end
 
 Gestor -> Gestor : buscarEstadoParaAsignar()
 Gestor -> EstadoPrestamo : esFinalizado()*
 Gestor -> Gestor : actualizarEstadoPrestamo()
+Gestor -> Gestor : obtenerFechaHoraActual()
 
 Gestor -> Ps : actualizarEstadoPrestamo()
 Ps -> Ps : obtenerEstadoActual()
 Ps -> ACEp : setFechaHoraFin()
 Ps -> Ps : crearCambioEstado()
-create entity CEp as "Finalizado:CambioEstadoPrestamo"
-Ps --> CEp : new()
+create entity FCEp as "Finalizado:CambioEstadoPrestamo"
+Ps --> FCEp : new()
 
 Gestor -> Gestor : finCU()
 @enduml

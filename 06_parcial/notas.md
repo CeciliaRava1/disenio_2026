@@ -1,1 +1,1 @@
-1. Revisar consejos realizaciones tema cambio de estado
+1. Revisar colores de las entidades
