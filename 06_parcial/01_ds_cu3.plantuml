@@ -111,7 +111,7 @@ Gestor -> Pantalla : mostrarPagoExitoso()
 '12. Sistema actualiza estado cuota a 'pagada', actualiza el saldo
 'pendiente del prestamo
 Gestor -> Gestor : buscarEstadoParaAsignar()
-Gestor -> EstadoCuota : esPagada()*
+Gestor -> EstadoCuota : sosPagada()*
 
 Gestor -> Gestor : obtenerFechaHoraActual()
 Gestor -> Gestor : actualizarEstadoCuota()
@@ -140,7 +140,7 @@ group Buscar cuotas pendientes [ mientras haya cuotas ]
 end
 
 Gestor -> Gestor : buscarEstadoParaAsignar()
-Gestor -> EstadoPrestamo : esFinalizado()*
+Gestor -> EstadoPrestamo : sosFinalizado()*
 Gestor -> Gestor : actualizarEstadoPrestamo()
 Gestor -> Gestor : obtenerFechaHoraActual()
 

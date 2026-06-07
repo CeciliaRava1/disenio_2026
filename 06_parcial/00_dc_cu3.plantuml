@@ -15,6 +15,7 @@ class PantPagoCuota {
   + opPagoCuota()
   + habilitarVentana()
   + mostrarPrestamosActivos()
+  + solicitarSeleccionPrestamo()
   + tomarSeleccionPrestamo()
   + mostrarCuotas()
   + solicitarSeleccionCuotas()
@@ -43,6 +44,9 @@ class GestorPagoCuota {
   + ordenarCuotasAsc()  
   + tomarSeleccionCuota()
   + buscarEstadoCuota()
+  + llamarCUPagoCuota()
+  + buscarEstadoParaAsignar()
+  + obtenerFechaHoraActual()
   + tomarConfirmacionPago()
   + actualizarEstadoCuota()
   + actualizarSaldoPrestamo()
@@ -71,6 +75,7 @@ class Usuario {
   + clave : Varchar
 
   + obtenerClienteLogueado()
+  + obtenerPrestamosActivos()
 }
 
 class Prestamo {
@@ -84,25 +89,25 @@ class Prestamo {
   + obtenerSaldoPendiente()
   + obtenerCantidadCuotas()
   + obtenerCuotasPrestamo()
-  + actualizarEstadoCuota()
-  + actualizarSaldoPendiente()
-  + actualizarEstadoPrestamo()
-
 }
 
 class CambioEstadoPrestamo {
   - nombre
   - descripcion
+  - fechaHoraInicio
+  - fechaHoraFin
 
-  + esActual()
+  + sosActual()
+  + sosActivo()
+  + setFechaHoraFin()
 }
 
 class EstadoPrestamo {
   - nombre
   - descripcion
 
-  + esActivo()
-  + esFinalizado()
+  + sosActivo()
+  + sosFinalizado()
 }
 
 class Cuota {
@@ -114,16 +119,30 @@ class Cuota {
   + obtenerFechaVto()
   + obtenerMontoBase()
   + obtenerEstadoCuota()
+  + crearCambioEstado()
   + actualizarEstadoCuota()
-  + obtenerCuotas()
+  + obtenerCuotasPendientes()
+}
+
+
+class CambioEstadoCuota {
+  - nombre
+  - descripcion
+  - fechaHoraInicio
+  - fechaHoraFin
+
+  + sosActual()
+  + sosProgramada()
+  + sosPendiente()
+  + obtenerEstadoActual()
+  + setFechaHoraFin()
 }
 
 class EstadoCuota {
   - nombre
   - descripcion
-
-  + esProgramada()
-  + esPagada()
+  
+  + sosPagada()
 }
 
 
