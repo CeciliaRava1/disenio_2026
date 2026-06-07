@@ -1,0 +1,155 @@
+@startuml diagramaClase
+
+autonumber
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+' --- CLASES DE ANALISIS ---
+actor Cliente as ":Cliente"
+boundary Pantalla as ":PantallaPagoCuota"
+control Gestor as ":GestorPagoCuota"
+
+' --- CLASES DEL DOMINIO ---
+entity ASesion as "A:Sesion"
+entity LUsuario as "L:Usuario"
+entity Prestamo as ":Prestamo" #ee7829
+entity CambioEstadoPrestamo as "CambioEstadoPrestamo" #ee7829
+entity ACambioEstadoPrestamo as "A:CambioEstadoPrestamo"
+entity AEstadoPrestamo as "A:EstadoPrestamo"
+
+entity SPrestamo as "S:Prestamo"
+entity Cuota as ":Cuota" #ee7829
+entity SCuota as "S:Cuota"
+entity CambioEstadoCuota as "CambioEstadoCuota" #ee7829
+entity ACambioEstadoCuota as "A:CambioEstadoCuota"
+entity AEstadoCuota as "A:EstadoCuota"
+
+participant CUPagoCuota as ":CUPagoCuota"
+entity EstadoCuota as ":EstadoCuota" #ee7829
+entity EstadoPrestamo as ":EstadoPrestamo" #ee7829
+
+
+'1. Cliente selecciona opcion 
+Cliente --> Pantalla : opPagoCuota()
+Pantalla -> Pantalla : habilitarVentana()
+Pantalla --> Gestor : opPagoCuota()
+
+
+'2. Sistema obtiene cliente logueado
+Gestor -> Gestor : buscarClienteLogueado()
+Gestor -> ASesion : obtenerClienteLogueado()
+ASesion -> LUsuario : obtenerClienteLogueado()
+
+'2. Sistema busca estado objeto
+Gestor -> Gestor : buscarPrestamosActivos()
+Gestor -> LUsuario : obtenerPrestamosActivos()
+group Buscar prestamos activos [ mientras haya prestamos ]
+    LUsuario -> Prestamo : obtenerPrestamosActivos()
+    Prestamo -> CambioEstadoPrestamo : sosActual()*
+    Prestamo -> ACambioEstadoPrestamo : sosActivo()
+    ACambioEstadoPrestamo -> AEstadoPrestamo : sosActivo()
+    LUsuario -> Prestamo : obtenerNro()
+    LUsuario -> Prestamo : obtenerSaldoPendiente()
+    LUsuario -> Prestamo : obtenerCantidadCuotas()
+end
+
+'2. Sistema muestra algo
+Gestor -> Pantalla : mostrarPrestamosActivos()
+
+'3. Cliente selecciona entidad
+Gestor -> Pantalla : solicitarSeleccionPrestamo()
+Cliente -> Pantalla : tomarSeleccionPrestamo()
+Pantalla -> Gestor : tomarSeleccionPrestamo()
+
+'4. Sistema busca las partes de un todo
+Gestor -> Gestor : buscarCuotasPrestamo()
+Gestor -> SPrestamo : obtenerCuotasPrestamo()
+group Buscar cuotas prestamo [ mientras haya cuotas ]
+    SPrestamo -> Cuota : obtenerNroCuota()
+    SPrestamo -> Cuota : obtenerFechaVto()
+    SPrestamo -> Cuota : obtenerMontoBase()
+end
+
+'4. Sistema muestra algo ordenado
+Gestor -> Gestor : ordenarCuotasAsc()
+Gestor -> Pantalla : mostrarCuotasPrestamo()
+
+'5. Sistema solicita seleccion
+Gestor -> Pantalla : solicitarSeleccionCuota()
+
+'6. Cliente selecciona entidad
+Cliente -> Pantalla : tomarSeleccionCuota()
+Pantalla -> Gestor : tomarSeleccionCuota()
+
+'7. Sistema busca estado objeto
+Gestor -> Gestor : buscarEstadoCuota()
+Gestor -> SCuota : obtenerEstadoCuota()
+SCuota -> CambioEstadoCuota : sosActual()*
+SCuota -> ACambioEstadoCuota : sosProgramada()
+ACambioEstadoCuota -> AEstadoCuota : sosProgramada()
+
+'8. Sistema muestra algo
+Gestor -> Pantalla : mostrarMontoBase()
+
+'9. Sistema solicita confirmacion
+Gestor -> Pantalla : solicitarConfirmacionPago()
+
+'10. Cliente confirma
+Cliente -> Pantalla : tomarConfirmacionPago()
+Pantalla -> Gestor : tomarConfirmacionPago()
+
+'11. Sistema llama CU
+Gestor -> Gestor : llamarCUPagoCuota()
+Gestor --> CUPagoCuota : <<include>>
+
+'11. Sistema muestra mensaje de exito
+Gestor -> Pantalla : mostrarEjecucionExitosa()
+
+'12. Sistema actualiza estado
+Gestor -> Gestor : buscarEstadoCuota()
+Gestor -> SPrestamo : obtenerEstadoPagada()
+SPrestamo -> EstadoCuota : esPagada()*
+Gestor -> Gestor : obtenerFechaHoraActual()
+
+Gestor -> Gestor : actualizarEstadoCuota()
+Gestor -> SPrestamo : actualizarEstadoCuota()
+SPrestamo -> SCuota : actualizarEstadoCuota()
+SCuota -> SCuota : obtenerEstadoActual()
+SPrestamo -> ACambioEstadoPrestamo : setFechaHoraFin()
+SCuota -> SCuota : crearCambioEstado()
+create entity PCambioEstadoCuota as "pagada:CambioEstadoCuota"
+SCuota --> PCambioEstadoCuota : new()
+
+'12. Sistema actualiza atributo entidad
+Gestor -> Gestor : actualizarSaldoPendiente()
+Gestor -> SPrestamo : actualizarSaldoPendiente()
+
+'13. Sistema busca estado entidad
+Gestor -> Gestor : buscarCuotasPendientes()
+Gestor -> SPrestamo : obtenerCuotasPendientes()
+group Buscar cuotas pendientes [ mientras haya cuotas ]
+    SPrestamo -> Cuota : obtenerCuotasPendientes()
+    Cuota -> CambioEstadoCuota : sosActual()*
+    Cuota -> ACambioEstadoCuota : sosPendiente()
+    ACambioEstadoCuota -> EstadoCuota : sosPendiente()
+end
+
+'13.Sistema actualiza estado
+Gestor -> Gestor : buscarEstadoPrestamo()
+Gestor -> SPrestamo : obtenerEstadoFinalizado()
+SPrestamo -> EstadoPrestamo : esFinalizado()*
+Gestor -> Gestor : obtenerFechaHoraActual()
+
+Gestor -> Gestor : actualizarEstadoPrestamo()
+Gestor -> SPrestamo : actualizarEstadoPrestamo()
+SPrestamo -> SPrestamo : obtenerEstadoActual()
+
+SPrestamo -> ACambioEstadoPrestamo : setFechaHoraFin()
+SPrestamo -> SPrestamo : crearCambioEstado()
+create entity FCambioEstadoPrestamo as "finalizado:CambioEstadoPrestamo"
+SPrestamo --> FCambioEstadoPrestamo : new()
+
+'13. Fin CU
+Gestor -> Gestor : finCU()
+@enduml
