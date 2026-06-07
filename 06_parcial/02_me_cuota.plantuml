@@ -1,0 +1,22 @@
+@startuml meCuota
+[*] --> Creada: new()
+Creada -> Programada
+Creada -> Anulada
+Programada --> Pagada 
+Programada --> Vencida
+Vencida --> EnMora
+Vencida --> Pagada
+EnMora --> Incobrable
+EnMora --> Pagada 
+
+Pagada --> [*]
+Incobrable --> [*]
+Anulada --> [*]
+
+' -- ESTADOS POSIBLES CUOTA --
+'1. Programada
+'2. Pagada
+'4. Vencida
+'5. En mora
+'6. Incobrable
+'7. Anulada

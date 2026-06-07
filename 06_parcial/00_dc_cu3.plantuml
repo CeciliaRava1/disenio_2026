@@ -148,20 +148,20 @@ class EstadoCuota {
 
 ' --- RELACIONES ---
 PantPagoCuota <..> GestorPagoCuota
-GestorPagoCuota "1" -> Sesion
-GestorPagoCuota "0...*" -> Prestamo
-GestorPagoCuota "1...*" -> Cuota
+GestorPagoCuota  ..> "1" Sesion
+GestorPagoCuota  ..> "0...*" Prestamo : Prestamo
+GestorPagoCuota  ..> "0...*" Cuota : Cuota
 
-Sesion "1" -> Usuario
-Usuario "1" -> Cliente
-Cliente "0...*" --> Prestamo
+Sesion "1" --> "1" Usuario : Usuario
+Usuario "1" -> "1" Cliente : Cliente
+Cliente "1" --> "0...*" Prestamo : Prestamo
 
-Prestamo "1...*" --> CambioEstadoPrestamo
-CambioEstadoPrestamo "1" -> EstadoPrestamo
+Prestamo "1...*" --> "1" CambioEstadoPrestamo : CambioEstadoPrestamo
+CambioEstadoPrestamo "1" -> "1" EstadoPrestamo : EstadoPrestamo
 
-Prestamo "1...*" *-- Cuota
-Cuota "1...*" --> CambioEstadoCuota
-CambioEstadoCuota "1" -> EstadoCuota
+Prestamo "1...*" *-- "1" Cuota : Cuotas
+Cuota "1...*" --> "1" CambioEstadoCuota : CambioEstadoCuota
+CambioEstadoCuota "1" -> "1" EstadoCuota : EstadoCuota
 
 
 @enduml

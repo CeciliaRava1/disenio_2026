@@ -44,7 +44,7 @@ Gestor -> Gestor : buscarPrestamosActivos()
 Gestor -> Usuario : obtenerPrestamosActivos()
 
 group Buscar prestamos activos [ Mientras haya prestamos ]
-    Usuario -> Prestamo : obtenerPrestamo()
+    Usuario -> Prestamo : obtenerPrestamosActivos()
     Prestamo -> CEp : sosActual()*
     Prestamo -> ACEp : sosActivo()
     ACEp -> Ap : sosActivo()
