@@ -1,0 +1,77 @@
+@startuml DiagramaClases
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam shadowing false
+
+' ==========================================
+' CLASES BOUNDARY Y CONTROL
+' ==========================================
+
+
+' ==========================================
+' ENTIDADES DE DOMINIO
+' ==========================================
+class Laboreo <<Entity>> {
+  
+}
+
+class MomentoLaboreo <<Entity>> {
+  
+}
+
+class Lote <<Entity>> {
+  
+}
+
+class Campo <<Entity>> {
+  
+}
+
+class ProyectoCultivo <<Entity>> {
+  
+}
+
+class EstadoProyectoCultivo <<Entity>> {
+  
+}
+
+class Cultivo <<Entity>> {
+  
+}
+
+class TipoLaboreo <<Entity>> {
+  
+}
+
+class Empleado <<Entity>> {
+  
+}
+
+class TipoSuelo <<Entity>> {
+  
+}
+
+class TipoCultivo <<Entity>> {
+  
+}
+
+
+' ==========================================
+' RELACIONES
+' ==========================================
+
+' Relaciones Pantalla - Gestor (Conocimiento mutuo, flechas punteadas)
+'PantSegBolsines <..> GestorSegBolsines
+
+Campo "1...*" *- "1" Lote : Lote
+Lote "1" -> "1" TipoSuelo : TipoSuelo
+Lote "1" -> "1" Cultivo : Cultivo
+TipoSuelo "1...*" -> "1" TipoCultivo : TipoCultivo
+
+Lote "0...*" -> "1" ProyectoCultivo : ProyectoCultivo
+ProyectoCultivo "1" -> "1" EstadoProyectoCultivo : EstadoProyectoCultivo
+
+ProyectoCultivo "0...*" -> "1" MomentoLaboreo : MomentoLaboreo
+MomentoLaboreo "1" -> "1" Laboreo : Laboreo
+Laboreo "1" -> "1" TipoLaboreo : TipoLaboreo
+Cultivo "1" -> "1" TipoCultivo : TipoCultivo

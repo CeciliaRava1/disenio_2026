@@ -1,0 +1,172 @@
+@startuml dsCU1
+
+autonumber
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+' #ee7829
+' estado: Campo (habilitado), ProyCultivo (En preparacion, Laboreo post siembra, final, cancelado)
+actor EL as ":EL"
+boundary Pantalla as ":PantRegLaboreo"
+control Gestor as ":GestorRegLaboreo"
+
+entity Campo as ":Campo" #ee7829
+entity SCampo as "S:Campo"
+entity Lote as ":Lote" #ee7829
+
+entity ProyectoCultivo as ":ProyectoCultivo" 
+entity VProyectoCultivo as "V:ProyectoCultivo" 
+entity EstadoProyectoCultivo as ":EstadoProyectoCultivo"
+entity SLote as "S:Lote" #ee7829 
+
+entity Laboreo as ":Laboreo" #ee7829 
+entity SLaboreo as "S:Laboreo" 
+entity Cultivo as ":Cultivo"
+entity TipoCultivo as ":TipoCultivo"
+entity Orden as ":OrdenLaboreo"
+entity TipoLaboreo as ":TipoLaboreo"
+entity Empleado as ":Empleado" #ee7829 
+
+'1. Cliente selecciona opcion
+EL --> Pantalla : opRegLaboreosLote()
+Pantalla -> Pantalla : habilitarVentana()
+Pantalla --> Gestor : opRegLaboreosLote()
+
+'2. Sistema muestra entidad con atributo con un criterio
+Gestor -> Gestor : buscarCamposHabilitados()
+group Buscar campos habilitados [ mientras haya campos ]
+    Gestor -> Campo : sosHabilitado()
+    Gestor -> Campo : obtenerNombreCampo()
+end
+Gestor -> Pantalla : mostrarCamposHabilitados()
+Gestor -> Pantalla : solicitarSeleccionCampo()
+
+'3. Cliente selecciona entidad
+EL -> Pantalla : tomarSeleccionCampo()
+Pantalla -> Gestor : tomarSeleccionCampo()
+
+'4. Sistema busca partes de un todo
+Gestor -> Gestor : buscarLotesPCVigente()
+Gestor -> SCampo : obtenerLotesPCVigente()
+group Buscar lotes PC Vigente [ mientras haya lotes ]
+    SCampo -> Lote : obtenerLotesPCVigente()
+    SCampo -> Lote : obtenerFechaInicio()
+
+    group Buscar proyectos vigentes [ mientras haya PC ]
+        Lote -> ProyectoCultivo : obtenerPCVigente()
+        ProyectoCultivo -> EstadoProyectoCultivo : sosVigente()
+        Lote -> ProyectoCultivo : obtenerFechaInicio()
+    end
+
+    SCampo -> Lote : obtenerNroLote()
+end
+
+'5. Sistema solicita seleccion (varios)
+Gestor -> Pantalla : mostrarLotesPCVigente()
+Gestor -> Pantalla : solicitarSeleccionLotes()
+EL -> Pantalla : tomarSeleccionLotes()
+Pantalla -> Gestor : tomarSeleccionLotes()
+
+'Lote -> PoryVigente -> Cultivo
+'ProyVigente -> Laboreos
+
+'6. Sistema muestra atributo entidad seleccionada
+Gestor -> Gestor : buscarDatosLote()
+Gestor -> SCampo : obtenerNombreCultivo()
+group Buscar datos lote [ mientras haya lotes ]
+    SCampo -> SLote : obtenerNombreCultivo()
+    SLote -> VProyectoCultivo : obtenerNombreCultivo()
+    VProyectoCultivo -> Cultivo : obtenerNombreCultivo()
+    Cultivo -> TipoCultivo : obtenerNombreCultivo()
+    Gestor -> Pantalla : mostrarCultivos()
+
+    group Buscar laboreos efectuados [ mientras haya laboreos ]
+        SCampo -> SLote : obtenerLaboreosEfectuados()
+        SLote -> VProyectoCultivo : obtenerLaboreosEfectuados()
+        VProyectoCultivo -> Laboreo : obtenerLaboreosEfectuados()
+        Laboreo -> Orden : obtenerLaboreosEfectuados()
+        Orden -> TipoLaboreo : obtenerNombreLaboreo()
+    end
+
+    Gestor -> Pantalla : mostrarLaboreos()
+
+end
+
+
+
+'7. Sistema muestra tipos de algo
+' SCampo -> SLote -> TipoSuelo -> Cultivo -> TipoCultivo
+Gestor -> Gestor : buscarTiposLaboreo ()
+Gestor -> SCampo : obtenerTiposLaboreo()
+group Buscar laboreos posibles [ mientras haya lotes ]
+    SCampo -> SLote : obtenerTiposLaboreo()
+    SLote -> Cultivo : obtenerTiposLaboreo()
+    Cultivo -> TipoCultivo : obtenerTiposLaboreo()
+    TipoCultivo -> Laboreo : obtenerTiposLaboreo()
+    Laboreo -> TipoLaboreo : obtenerTiposLaboreo()*
+end
+
+Gestor -> Pantalla : mostrarLaboreos()
+
+'8. Sistema solicita seleccion
+Gestor -> Pantalla : solicitarSeleccionLaboreo()
+
+'9. Cliente selecciona entidad
+EL -> Pantalla : tomarSeleccionLaboreo()
+Pantalla -> Gestor : tomarSeleccionLaboreo()
+
+'10. Sistema solicita fechas
+Gestor -> Pantalla : solicitarFechaHoraInicio()
+Gestor -> Pantalla : solicitarFechaHoraFin()
+
+'11. Cliente ingresa fechas
+EL -> Pantalla : tomarIngresoFechaHoraInicio()
+EL -> Pantalla : tomarIngresoFechaHoraFin()
+Pantalla -> Gestor : tomarIngresoFechaHoraInicio()
+Pantalla -> Gestor : tomarIngresoFechaHoraFin()
+
+'12. Sistema valida fechas
+Gestor -> Gestor : obtenerFechaHoraActual()
+Gestor -> Gestor : validarFechasIngresadas()
+
+'13. Sistema muestra entidades
+Gestor -> Gestor : buscarEmpleados()
+Gestor -> Empleado: obtenerEmpleados()*
+Gestor -> Pantalla : mostrarEmpleados()
+Gestor -> Pantalla : solicitarSeleccionEmpleado()
+
+'14. Cliente selecciona entidad
+EL -> Pantalla : tomarSeleccionEmpleado()
+Pantalla -> Gestor : tomarSeleccionEmpleado()
+
+'15. Sistema solicita confirmacion
+Gestor -> Pantalla : solicitarConfirmacionRegistro()
+
+'16. Cliente confirma 
+EL -> Pantalla : tomarConfirmacionRegistro()
+Pantalla -> Gestor : tomarConfirmacionRegistro()
+
+'17. Sistema registra nueva instancia de clase
+Gestor -> Gestor : crearLaboreo()
+Gestor -> SCampo : crearLaboreo()
+SCampo -> SLote : crearLaboreo()
+SLote -> VProyectoCultivo : crearLaboreo()
+
+VProyectoCultivo -> RLaboreo : new()
+
+'18. Valida tipo de entidad
+'Lote -> PoryVigente -> Cultivo
+'ProyVigente -> Laboreos
+Gestor -> Gestor : validarTipoLaboreo()
+Gestor -> SLote : validarTipoLaboreo()
+SLote -> ProyectoCultivo : validarTipoLaboreo()
+ProyectoCultivo -> SLaboreo : validarTipoLaboreo()
+SLaboreo -> TipoLaboreo : esSiembra()
+SLaboreo -> TipoLaboreo : esCosecha()
+
+'19. Cliente selecciona opcion
+EL -> Pantalla : opFinReigstro()
+Pantalla -> Gestor : opFinRegistro()
+
+Gestor -> Gestor : finCU()
