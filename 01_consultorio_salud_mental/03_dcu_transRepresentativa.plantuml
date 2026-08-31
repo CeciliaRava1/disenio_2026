@@ -3,6 +3,8 @@ left to right direction
 
 actor "Encargado de Personal" as EP
 actor "Usuario" as US
+actor "Secretaria" as SE
+
 
 usecase "6. Registrar un profesional" as U6
 usecase "7. Dar de baja un profesional" as U7
@@ -12,6 +14,8 @@ usecase "26. Generar informe de turnos asistidos por profesional" as U26
 usecase "27. Generar listado de profesionales" as U27
 usecase "28. Generar estadística de turnos por estado" as U28
 usecase "16. Iniciar sesion" as U16
+usecase "14. Registrar asistencia de paciente" as U14
+
 
 
 EP --> U6
@@ -24,4 +28,6 @@ EP --> U28
 
 EP--> US
 US --> U16
+SE --> U14
+SE --> US
 @enduml
