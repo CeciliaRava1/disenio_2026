@@ -1,0 +1,14 @@
+@startuml usecaseDiagram
+left to right direction
+
+actor "Administrador de campos" as AC
+usecase "12.Registrar campo" as U12
+usecase "14.Consultar campo" as U14
+usecase "13.Modificar campo" as U13
+usecase "15.Eliminar campo" as U15
+
+AC --> U12
+AC --> U14
+AC --> U13
+AC --> U15
+@enduml

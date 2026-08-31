@@ -1,0 +1,69 @@
+1. EN: selecciona la opción “Cancelar Vuelo”.
+2. Sistema: muestra todos los vuelos posibles de cancelar (número vuelo, origen, destino y horario) que se encuentren
+demorados, programados, en embarque, reprogramados y/o en ejecución.
+3. EN: selecciona un Vuelo
+4. Sistema: requiere seleccionar un motivo de cancelación
+5. EN: seleccionar un motivo de la cancelación
+6. Sistema: solicita ingresar una descripción sobre la cancelación
+7. EN: ingresa la descripción de la cancelación
+8. Sistema: solicita confirmar la cancelación del vuelo
+9. EN: confirma la cancelación del vuelo
+10. Sistema: registra el motivo, descripción, fecha, hora y usuario responsable de la cancelación del vuelo. Además, actualiza el
+estado del vuelo a Cancelado y notifica a los interesados (ver Observación 1.). Fin del caso de uso
+
+
+@startuml test
+
+autonumber
+
+actor EL AS A
+boundary PantCancelarVuelo AS P
+control GestorCancelarVuelo AS G
+entity Vuelo AS V
+entity cambioEstadoVuelo AS ceV
+entity estadoVuelo AS eV
+
+boundary PantInformativa AS Pi
+
+
+A-> P: opCancelarVuelo()
+P-> P: habilitarVentana()
+P-> G: opCancelarVuelo()
+G-> G: buscarVuelos()
+
+group Buscar vuelos [mientras haya vuelos]
+    G-> V: buscarVuelos()
+    G-> V: getNumeroVuelo()
+    G-> V: getOrigen()
+    G-> V: getDestino()
+    G-> V: getHorario()
+    G-> V: getEstadoActual()
+    V-> ceV: esFinal()
+    ceV-> eV: esFinal()
+end
+
+G-> P: mostrarVuelos()
+A-> P: seleccionarVuelo()
+P-> G: tomarSeleccionVuelo()
+
+G-> G: solicitarMotivoCancelacion()
+G-> P: mostrarIngresoMotivoCanc()
+A-> P: seleccionarMotivoCancelacion()
+P-> G: tomarMotivoCancelacion()
+
+G-> G: solicitarDescCancelacion()
+G-> P: solicitarDescCancelacion()
+A-> P: ingresarDescCancelacion()
+P-> G: tomarDescCancelacion()
+G-> G: solicitarConfirmacion()
+G-> P: solicitarConfirmacion()
+A-> P: confirmarCancelacion()
+P-> G: tomarConfirmacion()
+G-> G: registrarCancelacion()
+G-> V: actualizarEstadoCancelado()
+G-> G: notificarInteresados()
+G-> Pi: mostrarNotificacion()
+G-> G: finCU()
+
+
+@enduml

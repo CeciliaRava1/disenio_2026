@@ -1,0 +1,28 @@
+@startuml usecaseDiagram
+left to right direction
+
+actor "Administrador de campos" as AC
+actor "Encargado de laboreos" as EL
+actor "Usuario" as US
+usecase "12.Registrar campo" as U12
+usecase "14.Consultar campo" as U14
+usecase "13.Modificar campo" as U13
+usecase "15.Eliminar campo" as U15
+usecase "1. Registrar laboreos en lotes" as U1
+usecase "7. Iniciar sesion" as U7
+usecase "73. Generar estadisticas de rendimiento de lotes" as U73
+usecase "62. Generar historico de proyectos de cultivo por campo o lote" as U62
+
+
+AC --> U12
+AC --> U14
+AC --> U13
+AC --> U15
+AC --> U73
+AC --> U62
+
+EL --> U1
+EL --> US
+AC --> US
+US --> U7
+@enduml

@@ -1,0 +1,82 @@
+opciones Pantalla
+tomarOpcion Gestor
+
+
+@startuml classDiagram
+
+
+PantCancelarVuelo ...> GestorCancelarVuelo
+GestorCancelarVuelo ...> PantCancelarVuelo
+GestorCancelarVuelo ...> Vuelo
+GestorCancelarVuelo ...> PantInformativa
+PantInformativa ...> GestorCancelarVuelo
+Vuelo -->"0..*" CambioEstadoVuelo : cambioDeEstado
+CambioEstadoVuelo -->"1" EstadoVuelo : estadoVuelo
+
+
+class PantCancelarVuelo {
+    +vuelos : List<Vuelo>
+    +vueloSeleccionado : Vuelo
+    +motivoCancelacion : String
+    +descCancelacion : String
+    +opcionConfirmar : boolean
+
+    +habilitarVentana()
+    +mostrarVuelos()
+    +mostrarIngresoMotivoCanc()
+    +solicitarDescCancelacion()
+    +solicitarConfirmacion()
+}
+
+class GestorCancelarVuelo {
+    +vuelos : List<Vuelo>
+    +vueloSeleccionado : Vuelo
+    +motivoCancelacion : String
+    +descCancelacion : String
+
+    +opCancelarVuelo()
+    +buscarVuelos()
+    +solicitarMotivoCancelacion()
+    +tomarMotivoCancelacion()
+    +solicitarDescCancelacion()
+    +tomarDescCancelacion()
+    +solicitarConfirmacion()
+    +tomarConfirmacion()
+    +registrarCancelacion()
+    +notificarInteresados()
+    +finCU()
+}
+
+class Vuelo {
+    +numeroVuelo: String
+    +aeropuertoOrigen: String
+    +aeropuertoDestino: String
+    +fechaHoraSalida: DateTime
+    +fechaHoraLlegada: DateTime
+    +estadoActual: EstadoVuelo
+
+    +actualizarEstadoCancelado()
+    +cancelarVuelo()
+}
+
+class CambioEstadoVuelo {
+    +nombreEstado: String
+    +descripcion: String
+
+    +getEstado(): boolean
+}
+
+class EstadoVuelo {
+    +nombreEstado: String
+    +descripcion: String
+
+    +esFinal(): boolean
+}
+
+class PantInformativa {
+    +notificacion : String
+
+    +mostrarNotificacion()
+}
+
+@enduml

@@ -1,0 +1,14 @@
+@startuml usecaseDiagram
+left to right direction
+
+actor "Encargado de Personal" as EP
+usecase "6. Registrar un profesional" as U6
+usecase "7. Dar de baja un profesional" as U7
+usecase "8. Modificar profesional" as U8
+usecase "9. Consultar profesional" as U9
+
+EP --> U6
+EP --> U7
+EP --> U8
+EP --> U9
+@enduml
