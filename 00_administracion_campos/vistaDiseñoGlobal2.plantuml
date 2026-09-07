@@ -1,0 +1,66 @@
+@startuml VistaDiseñoGlobal_Componentes
+!theme plain
+skinparam roundcorner 10
+skinparam componentStyle rectangle
+
+' Mismos colores que usaste en la vista de dominios, para que se note
+' a qué subdominio pertenece cada microservicio
+skinparam component {
+    BackgroundColor<<Core>> #FFC0CB
+    BackgroundColor<<Soporte>> #FFAA33
+    BackgroundColor<<Generico>> #1E90FF
+    BackgroundColor<<Gateway>> #CCCCCC
+}
+skinparam database {
+    BackgroundColor #DDDDDD
+}
+
+' ---- Clientes / actores externos ----
+actor "Usuario Web" as UsuarioWeb
+actor "Usuario Mobile" as UsuarioMobile
+actor "Monitor de Rendimiento" as MonitorHW
+
+' ---- API Gateway ----
+component "API Gateway" as Gateway <<Gateway>>
+
+' ==== Patrón 1: microservicio CORE, con BD propia ====
+package "Microservicio <NombreCore>" as MS1 {
+    component "<NombreCore>" as Svc1 <<Core>>
+    database "BD <NombreCore>" as DB1
+    Svc1 -- DB1
+}
+
+' ==== Patrón 2: microservicio con acceso Web Y Mobile, con BD ====
+package "Microservicio <NombreConMobile>" as MS2 {
+    component "<Nombre> (Web)" as Svc2Web <<Soporte>>
+    component "<Nombre> (Mobile)" as Svc2Mobile <<Soporte>>
+    database "BD <Nombre>" as DB2
+    Svc2Web -- DB2
+    Svc2Mobile -- DB2
+}
+
+' ==== Patrón 3: microservicio GENÉRICO de integración externa, SIN BD ====
+package "Microservicio <NombreIntegracion>" as MS3 {
+    component "<NombreIntegracion>" as Svc3 <<Generico>>
+}
+
+' ==== Patrón 4: microservicio GENÉRICO con BD (ej: Usuarios) ====
+package "Microservicio <NombreGenericoConBD>" as MS4 {
+    component "<Nombre>" as Svc4 <<Generico>>
+    database "BD <Nombre>" as DB4
+    Svc4 -- DB4
+}
+
+' ---- Conexiones a través del Gateway ----
+UsuarioWeb --> Gateway
+UsuarioMobile --> Gateway
+Gateway --> Svc1
+Gateway --> Svc2Web
+Gateway --> Svc2Mobile
+Gateway --> Svc4
+
+' ---- La integración externa recibe datos directamente del dispositivo ----
+MonitorHW --> Svc3
+Svc3 --> Gateway
+
+@enduml

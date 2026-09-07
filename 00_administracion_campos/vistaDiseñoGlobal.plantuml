@@ -1,0 +1,46 @@
+@startuml VistaDiseñoGlobal
+!theme plain
+skinparam roundcorner 15
+skinparam usecaseBorderColor black
+
+' Definición de colores para los dominios
+skinparam usecase {
+    BackgroundColor<<Core>> #FFC0CB
+    BackgroundColor<<Soporte>> #FFAA33
+    BackgroundColor<<Generico>> #1E90FF
+}
+
+rectangle "Service Containment Space\nDominios Core" as CoreSpace {
+    usecase "ProyectoDeCultivo" as C1 <<Core>>
+    usecase "Campo" as C2 <<Core>>
+    usecase "Lote" as C3 <<Core>>
+    usecase "Laboreo" as C4 <<Core>>
+    usecase "Cultivo" as C5 <<Core>>
+    usecase "Monitor" as C6 <<Core>>
+}
+
+rectangle "Service Containment Space\nDominios de Soporte" as SupportSpace {
+    usecase "OrdenDeLaboreo" as S1 <<Soporte>>
+    usecase "EstadoProyectoDeCultivo" as S2 <<Soporte>>
+    usecase "Empleado" as S3 <<Soporte>>
+    usecase "Tratamiento" as S4 <<Soporte>>
+}
+
+rectangle "Service Containment Space\nDominios Genéricos" as GenericSpace {
+    usecase "Usuarios\ny Accesos" as G1 <<Generico>>
+    usecase "Plaga" as G2 <<Generico>>
+    usecase "Agroquimico" as G3 <<Generico>>
+    usecase "TipoDeSuelo" as G4 <<Generico>>
+    usecase "Formateo datos" as G5 <<Generico>>
+    usecase "TipoDeLaboreo" as G6 <<Generico>>
+    usecase "MomentoLaboreo" as G7 <<Generico>>
+    usecase "UnidadDeMedida" as G8 <<Generico>>
+    usecase "DatosRelevados" as G9 <<Generico>>
+    usecase "Dosis" as G10 <<Generico>>
+    usecase "DetalleDatosRelevados" as G11 <<Generico>>
+}
+
+' Ordenamiento visual para que queden distribuidos de forma similar a la imagen
+CoreSpace -[hidden]right- SupportSpace
+SupportSpace -[hidden]down- GenericSpace
+@enduml
