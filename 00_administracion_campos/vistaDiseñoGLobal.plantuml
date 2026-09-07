@@ -1,0 +1,138 @@
+@startuml VistaDisenoGlobalMacro
+!theme plain
+' Esta directiva es la magia para que el flujo sea de Izquierda a Derecha
+left to right direction 
+skinparam componentStyle uml2
+skinparam roundcorner 10
+
+' Definición de la paleta de colores
+skinparam component {
+    BackgroundColor<<UI>> #7CFC00
+    BackgroundColor<<Gateway>> #FFE4E1
+    BackgroundColor<<Externo>> #FFE4E1
+    BackgroundColor<<Core>> #FFC0CB
+    BackgroundColor<<Soporte>> #FFAA33
+    BackgroundColor<<Generico>> #b0a7e7
+}
+skinparam databaseBackgroundColor white
+
+' ==========================================
+' COLUMNA 1: CLIENTES Y SISTEMAS EXTERNOS
+' ==========================================
+package "Interfaces de Usuario" <<Rectangle>> {
+    component "WebUI" <<UI>> as WebUI
+}
+
+rectangle "Externos" {
+    component "ServicioClimaAPI\n<<Sistema Externo>>" <<Externo>> as ExtClima
+    component "SensoresIoT\n<<Sistema Externo>>" <<Externo>> as ExtIoT
+}
+
+' ==========================================
+' COLUMNA 2: API GATEWAY
+' ==========================================
+' Usamos un componente grande que servirá de embudo
+rectangle "== API Gateway ==\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" <<Gateway>> as APIGateway
+
+' ==========================================
+' COLUMNA 3: MICROSERVICIOS Y SUS BASES DE DATOS
+' ==========================================
+' Grupo Core
+component "ServicioProyectoDeCultivo" <<Core>> as MSPCultivo
+database "BD\nPCultivo" as BDPCultivo
+
+component "ServicioLote" <<Core>> as MSLote
+database "BD\nLote" as BDLote
+
+component "ServicioLaboreo" <<Core>> as MSLaboreo
+database "BD\nLaboreo" as BDLaboreo
+
+component "ServicioCultivo" <<Core>> as MSCultivo
+database "BD\nCultivo" as BDCultivo
+
+component "ServicioDatosMonitor" <<Core>> as MSMonitor
+database "BD\nMonitor" as BDMonitor
+
+' Grupo Soporte
+component "ServicioOrdenDeLaboreo" <<Soporte>> as MSOrdenLaboreo
+database "BD\nOrdenDeLaboreo" as BDOrdenLaboreo
+
+component "ServicioEstadoProyectoDeCultivo" <<Soporte>> as MSEstadoPCultivo
+database "BD\nEstadoProyectoDeCultivo" as BDEstadoPCultivo
+
+component "ServicioEmpleado" <<Soporte>> as MSEmpleado
+database "BD\nEmpleado" as BDEmpleado
+
+component "ServicioTratamiento" <<Soporte>> as MSTratamiento
+database "BD\nTratamiento" as BDTratamiento
+
+component "ServicioCampo" <<Soporte>> as MSCampo
+database "BD\nCampo" as BDCampo
+
+' Grupo Genérico
+component "ServicioUsuarios" <<Generico>> as MSUsuarios
+database "BD\nUsuarios" as BDUsuarios
+
+component "ServicioPlaga" <<Generico>> as MSPlaga
+component "ServicioAgroquimico" <<Generico>> as MSAgroquimico
+component "ServicioTipoDeSuelo" <<Generico>> as MSTipoSuelo
+component "ServicioFormateoDatos" <<Generico>> as MSFormateo
+component "ServicioTipoDeLaboreo" <<Generico>> as MSTipoLaboreo
+component "ServicioMomentoLaboreo" <<Generico>> as MSMomentoLaboreo
+component "ServicioUnidadDeMedida" <<Generico>> as MSUnidadMedida
+component "ServicioDatosRelevados" <<Generico>> as MSDatosRelevados
+component "ServicioDosis" <<Generico>> as MSDosis
+component "ServicioDetalleDatosRelevados" <<Generico>> as MSDetalleDatosRelev
+
+
+' ==========================================
+' RELACIONES Y FLUJOS
+' ==========================================
+' 1. Conexiones físicas entre MS y sus propias BD (usamos - para línea corta)
+MSPCultivo -> BDPCultivo
+MSCultivo - BDCultivo
+MSLote - BDLote
+MSLaboreo - BDLaboreo
+MSMonitor - BDMonitor
+
+MSOrdenLaboreo - BDOrdenLaboreo
+MSEstadoPCultivo - BDEstadoPCultivo
+MSEmpleado - BDEmpleado
+MSTratamiento - BDTratamiento
+MSCampo - BDCampo
+
+MSUsuarios - BDUsuarios
+
+
+' 2. Conexiones de los Clientes al Gateway
+WebUI ---> APIGateway
+
+' 3. Conexiones de Externos al Gateway
+ExtClima ---> APIGateway
+ExtIoT ---> APIGateway
+
+' 4. Enrutamiento del Gateway hacia los Microservicios
+APIGateway ---> MSPCultivo
+APIGateway ---> MSLote
+APIGateway ---> MSLaboreo
+APIGateway ---> MSCultivo
+APIGateway ---> MSMonitor
+
+APIGateway ---> MSOrdenLaboreo
+APIGateway ---> MSEstadoPCultivo
+APIGateway ---> MSEmpleado
+APIGateway ---> MSTratamiento
+APIGateway ---> MSCampo
+
+APIGateway ---> MSUsuarios
+APIGateway ---> MSPlaga
+APIGateway ---> MSAgroquimico
+APIGateway ---> MSTipoSuelo
+APIGateway ---> MSFormateo
+APIGateway ---> MSTipoLaboreo
+APIGateway ---> MSMomentoLaboreo
+APIGateway ---> MSUnidadMedida
+APIGateway ---> MSDatosRelevados
+APIGateway ---> MSDosis
+APIGateway ---> MSDetalleDatosRelev
+@enduml
