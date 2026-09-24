@@ -1,0 +1,55 @@
+@startuml separacionDominios
+' Evitar sombras para un aspecto más plano y similar a la imagen
+skinparam shadowing false
+
+' Configuración de los contenedores
+skinparam rectangle {
+    BackgroundColor White
+    BorderColor Black
+    fontColor Black
+}
+
+' Configuración de los óvalos (casos de uso) y sus colores por estereotipo
+skinparam usecase {
+    BackgroundColor<<Soporte>> #F8A145
+    BackgroundColor<<Generico>> #B09EE6
+    BackgroundColor<<Core>> #FFB6C1
+    BorderColor Black
+    FontColor Black
+}
+
+' ==========================================
+' Service Containment Space: Dominios de Soporte
+' ==========================================
+rectangle "Service Containment Space\nDominios de Soporte" as ContenedorSoporte {
+    usecase "Organizacion" as Organizacion <<Soporte>>
+    usecase "Resolutor" as Resolutor <<Soporte>>
+}
+
+' ==========================================
+' Service Containment Space: Dominios Genéricos
+' ==========================================
+rectangle "Service Containment Space\nDominios Genéricos" as ContenedorGenericos {
+    usecase "Usuarios" as usuarios <<Generico>>
+    usecase "notificacionMail" as mail <<Generico>>
+    usecase "integracionMapa" as mapa <<Generico>>
+    usecase "integracionLocalizacionGPS" as gps <<Generico>>
+    usecase "IntegracionInstagram" as instagram <<Generico>>
+    usecase "IntergracionFacebook" as facebook <<Generico>>
+    usecase "NotificacionPush" as push <<Generico>>
+}
+
+' ==========================================
+' Service Containment Space: Dominios Core
+' ==========================================
+rectangle "Service Containment Space\nDominios Core" as ContenedorCore {
+    usecase "Evento" as Evento <<Core>>
+    usecase "EventoMasivo" as EventoMasivo <<Core>>
+    usecase "ResolucionEvento" as ResolucionEvento <<Core>>
+}
+
+' Enlaces ocultos para forzar la alineación horizontal de izquierda a derecha
+ContenedorSoporte -[hidden]right-> ContenedorGenericos
+ContenedorGenericos -[hidden]right-> ContenedorCore
+
+@enduml

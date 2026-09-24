@@ -1,0 +1,113 @@
+@startuml vistaDiseno_Global
+title Vista de Diseño global
+
+left to right direction
+skinparam componentStyle rectangle
+
+skinparam component {
+  BackgroundColor<<gateway>> #85C1E9
+  BackgroundColor<<microservicio>> #FADBD8
+  BackgroundColor<<subsistema>> #F8F9F9
+  BorderColor Black
+}
+
+skinparam database {
+  BackgroundColor White
+  BorderColor Black
+}
+
+skinparam rectangle {
+  BackgroundColor transparent
+  BorderColor Black
+}
+
+' ==========================================
+' CAPA 1: Interfaces y Sistemas Externos
+' ==========================================
+component "WebUI" as WebUI <<subsistema>>
+
+rectangle "Externos" as SistemasExternos {
+  component "ServicioLocalizacionGPS" as ServicioLocalizacionGPS
+  component "ServicioMapa" as ServicioMapa
+  component "ServicioCorreo" as ServicioCorreo
+  component "ServicioInstagram" as ServicioInstagram
+  component "ServicioFacebook" as ServicioFacebook
+  component "ServicioNotificacionPush" as ServicioNotificacionPush
+}
+
+' ==========================================
+' CAPA 2: Gateways (Enrutamiento)
+' ==========================================
+component "WebAPIGateway" as WebGateway <<gateway>>
+component "PublicAPIGateway" as PublicGateway <<gateway>>
+component "MobileAPIGateway" as MobileAPIGateway <<gateway>>
+' ==========================================
+' CAPA 3: Microservicios y Bases de Datos
+' ==========================================
+component "ServicioEvento" as SVC_Evento <<microservicio>>
+database "BD\nEvento" as DB_Evento
+
+component "ServicioEventoMasivo" as SVC_EventoMasivo <<microservicio>>
+database "BD\nEventoMasivo" as DB_EventoMasivo
+
+component "ServicioResolucionEvento" as SVC_ResolucionEvento <<microservicio>>
+database "BD\nResolucionEvento" as DB_ResolucionEvento
+
+component "ServicioOrganizacion" as SVC_Organizacion <<microservicio>>
+database "BD\nOrganizacion" as DB_Organizacion
+
+component "ServicioResolutor" as SVC_Resolutor <<microservicio>>
+database "BD\nResolutor" as DB_Resolutor
+
+component "ServicioUsuarios" as SVC_Usuarios <<microservicio>>
+database "BD\nUsuarios" as DB_Usuarios
+
+component "IntegracionLocalizacionGPS" as SVC_LocalizacionGPS <<microservicio>>
+component "IntegracionMapa" as SVC_IntegracionMapa <<microservicio>>
+component "IntegracionNotificacionMail" as SVC_NotificacionMail <<microservicio>>
+component "IntegracionInstagram" as SVC_IntegracionInstagram <<microservicio>>
+component "IntegracionFacebook" as SVC_IntegracionFacebook <<microservicio>>
+
+component "NotificacionPush" as SVC_NotificacionPush <<microservicio>>
+' ==========================================
+' RELACIONES: Acoplamiento de Bases de Datos
+' ==========================================
+' Se usa una línea sin flecha para denotar que la BD pertenece al servicio
+SVC_Evento - DB_Evento
+SVC_EventoMasivo - DB_EventoMasivo
+SVC_Organizacion - DB_Organizacion
+SVC_Resolutor - DB_Resolutor
+SVC_ResolucionEvento - DB_ResolucionEvento
+SVC_Usuarios - DB_Usuarios
+
+' ==========================================
+' RELACIONES: Flujo de solicitudes
+' ==========================================
+' Entradas a los Gateways
+WebUI ---> WebGateway
+ServicioLocalizacionGPS ---> PublicGateway
+ServicioMapa ---> PublicGateway
+ServicioCorreo ---> PublicGateway
+ServicioInstagram ---> PublicGateway
+ServicioFacebook ---> PublicGateway
+
+' Distribución desde WebAPIGateway
+WebGateway ---> SVC_Evento
+WebGateway ---> SVC_EventoMasivo
+WebGateway ---> SVC_ResolucionEvento
+WebGateway ---> SVC_Organizacion
+WebGateway ---> SVC_Resolutor
+WebGateway ---> SVC_Usuarios
+
+
+' Distribución desde PublicAPIGateway
+PublicGateway --> SVC_LocalizacionGPS
+PublicGateway --> SVC_IntegracionMapa
+PublicGateway --> SVC_NotificacionMail
+PublicGateway --> SVC_IntegracionInstagram
+PublicGateway --> SVC_IntegracionFacebook
+
+' Distribución desde MobileAPIGateway
+MobileAPIGateway --> SVC_NotificacionPush
+
+@enduml

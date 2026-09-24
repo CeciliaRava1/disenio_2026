@@ -1,0 +1,29 @@
+@startuml usecaseDiagram
+left to right direction
+
+actor "Cliente" as Cliente
+actor "Usuario" as Usuario
+actor "Resolutor" as Resolutor
+actor "GPS" as GPS
+actor "Google Maps" as GoogleMaps
+
+usecase "15. Registrar tipo de evento" as U15
+usecase "16. Modificar tipo de evento" as U16
+usecase "17. Consultar tipo de evento" as U17
+usecase "18. Eliminar tipo de evento" as U18
+usecase "1. Registrar evento" as U1
+usecase "28. Iniciar sesion" as U28
+
+Cliente --|> Usuario
+Resolutor --|> Usuario
+Usuario --> U28
+Cliente --> U15
+Cliente --> U16
+Cliente --> U17
+Cliente --> U18
+Resolutor --> U1
+
+U1 --> GPS
+U1 --> GoogleMaps
+
+@enduml
