@@ -16,8 +16,9 @@ usecase "14. Generar orden de traslado" as U14
 usecase "22. Iniciar sesion" as U22
 usecase "19. Monitorear ubicacion de contenedores" as U19
 usecase "24. Emitir reporte de traslados" as U24
+usecase "16. Procesar OT no analizadas" as U16
 
-AdminFIA --|> Usuario
+AdminFIA --|> ConsultorMapa
 CreadorOT --|> Usuario
 ConsultorMapa --|> Usuario
 Usuario --> U22
@@ -30,6 +31,7 @@ AdminFIA --> U24
 
 CreadorOT --> U14
 SCorreo --> U14
+U16 --> SCorreo
 ConsultorMapa --> U19
-GPS --> U19
+U19 --> GPS
 @enduml

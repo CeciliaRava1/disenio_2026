@@ -35,15 +35,21 @@ skinparam database {
 ' ==========================================
 
 component "WebUI" <<subsistema>> as WebUI #FADBD8 {
-    component "SeguimientoContenedorPresWeb" <<webiu>> as W_C1 
-    component "UsuarioPresWeb" <<webiu>> as W_C2 
-    component "EscuderiPresWeb" <<webiu>> as W_C3 
-    component "OrdenTrasladoPresWeb" <<webiu>> as W_C4 
+    component "UsuarioPresWeb" <<webiu>> as W_C1 
+    component "EscuderiaPresWeb" <<webiu>> as W_C2 
+    component "ComponentePresWeb" <<webiu>> as W_C3 
+    component "MonoplazaPresWeb" <<webiu>> as W_C4
+    component "CircuitoPresWeb" <<webiu>> as W_C5
+    component "TrasladoPresWeb" <<webiu>> as W_C6 
+    component "ContenedorPresWeb" <<webiu>> as W_C7 
     
     ' Forzar apilamiento vertical interno
     W_C1 -[hidden]d-> W_C2
     W_C2 -[hidden]d-> W_C3
     W_C3 -[hidden]d-> W_C4
+    W_C4 -[hidden]d-> W_C5
+    W_C5 -[hidden]d-> W_C6
+    W_C6 -[hidden]d-> W_C7
 }
 
 ' ==========================================
@@ -85,23 +91,17 @@ component "ServicioContenedor" <<subsistema>> as ServicioContenedor {
     SB_SeguimientoContenedor .u.> SB_Contenedor
 }
 
-database "BD\nOrdenTraslado" as BDOrdenTraslado
-component "ServicioOrdenTraslado" <<subsistema>> as ServicioOrdenTraslado {
-    component "PersistenciaServOrdenTraslado" <<persistencia>> as ServicioOrdenTraslado_DB 
-    component "OrdenTraslado" as SCM_OrdenTraslado
-    component "LugarOrigen" as SCM_LugarOrigen
-    component "LugarDestino" as SCM_LugarDestino
-    component "FechaArriboDestino" as SCM_FechaArriboDestino
+database "BD\nTraslado" as BDTraslado
+component "ServicioTraslado" <<subsistema>> as ServicioTraslado {
+    component "PersistenciaServTraslado" <<persistencia>> as ServicioTraslado_DB 
+    component "Traslado" as SCM_Traslado
+    component "ProcesadorOT" as SCM_ProcesadorOT
+    component "GeneradorOT" as SCM_GeneradorOT
 
-    ServicioOrdenTraslado_DB .u.> SCM_OrdenTraslado
-    ServicioOrdenTraslado_DB .u.> SCM_LugarOrigen
-    ServicioOrdenTraslado_DB .u.> SCM_LugarDestino
-    ServicioOrdenTraslado_DB .u.> BDOrdenTraslado
-    ServicioOrdenTraslado_DB .u.> SCM_FechaArriboDestino
-
-    SCM_OrdenTraslado ..> SCM_LugarOrigen
-    SCM_OrdenTraslado ..> SCM_LugarDestino
-    SCM_OrdenTraslado ..> SCM_FechaArriboDestino
+    ServicioTraslado_DB .u.> SCM_Traslado
+    ServicioTraslado_DB .u.> BDTraslado
+    SCM_ProcesadorOT .u.> SCM_Traslado
+    SCM_GeneradorOT .u.> SCM_Traslado
 }
 
 database "BD\nMonoplaza" as BDMonoplaza
@@ -174,8 +174,8 @@ PAG -[hidden]d-> ServicioIntegracionDispositivoGPS
 
 ' Alinear los microservicios del WAG horizontalmente
 ServicioComponente -[hidden]r-> ServicioContenedor
-ServicioContenedor -[hidden]r-> ServicioOrdenTraslado
-ServicioOrdenTraslado -[hidden]r-> ServicioMonoplaza
+ServicioContenedor -[hidden]r-> ServicioTraslado
+ServicioTraslado -[hidden]r-> ServicioMonoplaza
 ServicioMonoplaza -[hidden]r-> ServicioEscuderia
 ServicioEscuderia -[hidden]r-> ServicioUsuarios
 ServicioUsuarios -[hidden]r-> ServicioCircuito
@@ -193,8 +193,8 @@ ServicioComponente -u- SSB_I
 interface "IServicioContenedor" as SB_I
 ServicioContenedor -u- SB_I
 
-interface "IServicioOrdenTraslado" as SCM_I
-ServicioOrdenTraslado -u- SCM_I
+interface "IServicioTraslado" as SCM_I
+ServicioTraslado -u- SCM_I
 
 interface "IServicioMonoplaza" as SD_I
 ServicioMonoplaza -u- SD_I
@@ -243,4 +243,5 @@ WAG -d-( SU_Circuito
 PAG -d-( SIDG_I
 PAG -d-( SIM_I
 PAG -d-( SNM_I
+
 @enduml
