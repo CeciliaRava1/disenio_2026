@@ -1,0 +1,50 @@
+@startuml VistaDespliegue_Software
+skinparam componentStyle rectangle
+
+skinparam component {
+      BackgroundColor<<gateway>> #99CCFF
+      BackgroundColor<<executable>> #dda0dd
+}
+
+node "ClienteWebResponsive" <<web client>> as ClienteWebResponsive {
+  component ":Explorador" <<executable>>
+}
+
+node "Servidor Web y de Aplicaciones" as SRV {
+  component "WebAPIGateway" <<gateway>> as WAG
+  component "PublicAPIGateway" <<gateway>> as PAG
+  component "WebServer" <<executable>> as WebServer
+  component "WebUI" <<subsistema>> as WebUI
+  
+  database "BD\nEscuderia" as BDEscuderia
+  component "ServicioEscuderia" <<microservicio>> as ServicioEscuderia
+
+  database "BD\nUsuario" as BDUsuario
+  component "ServicioUsuario" <<microservicio>> as ServicioUsuario 
+
+  database "BD\nOrdenTraslado" as BDOrdenTraslado 
+  component "ServicioOrdenTraslado" <<microservicio>> as ServicioOrdenTraslado
+  
+  database "BD\nMonoplaza" as BDMonoplaza
+  component "ServicioMonoplaza" <<microservicio>> as ServicioMonoplaza
+  
+  database "BD\nContenedor" as BDContenedor
+  component "ServicioContenedor" <<microservicio>> as ServicioContenedor
+
+  database "BD\nCircuito" as BDCircuito
+  component "ServicioCircuito" <<microservicio>> as ServicioCircuito
+
+  database "BD\nComponente" as BDComponente
+  component "ServicioComponente" <<microservicio>> as ServicioComponente
+
+  ServicioEscuderia .u.> BDEscuderia
+  ServicioUsuario .u.> BDUsuario
+  ServicioOrdenTraslado .u.> BDOrdenTraslado  
+  ServicioMonoplaza .u.> BDMonoplaza
+  ServicioContenedor .u.> BDContenedor
+  ServicioCircuito .u.> BDCircuito
+  ServicioComponente .u.> BDComponente
+}
+ClienteWebResponsive      -- SRV
+
+@enduml

@@ -1,0 +1,246 @@
+'1 Subsistema WebUI con interfaces 
+'2 WebAPIGateway con papel
+'3 PublicAPIGateway con papel
+'4. Microservicios propios 
+    ' con chupetin en WebAPIGateway
+    ' con componente de persistencia relacionado con la base de datos
+'5. Microservicios externos con chupetin en PublicAPIGateway
+
+@startuml VistaDiseno_Detallada
+title Vista de Diseño de Componentes y Microservicios
+
+' Configuración global para estilo y disposición
+skinparam componentStyle rectangle
+skinparam nodesep 20
+skinparam ranksep 60
+skinparam linetype polyline
+skinparam DefaultTextAlignment center
+
+' Paleta de colores basada en el diagrama original
+skinparam component {
+    BackgroundColor<<subsistema>> #FADBD8
+    BackgroundColor<<microservicio>> #FADBD8
+    BackgroundColor<<gateway>> #99CCFF
+    BackgroundColor<<persistencia>> #AFFFFF
+    BackgroundColor #FFFFFF
+    BackgroundColor<<webiu>> #C4F5A3
+}
+
+skinparam database {
+    BackgroundColor White
+}
+
+' ==========================================
+' CAPA SUPERIOR: WebUI y Microservicios Base
+' ==========================================
+
+component "WebUI" <<subsistema>> as WebUI #FADBD8 {
+    component "SeguimientoContenedorPresWeb" <<webiu>> as W_C1 
+    component "UsuarioPresWeb" <<webiu>> as W_C2 
+    component "EscuderiPresWeb" <<webiu>> as W_C3 
+    component "OrdenTrasladoPresWeb" <<webiu>> as W_C4 
+    
+    ' Forzar apilamiento vertical interno
+    W_C1 -[hidden]d-> W_C2
+    W_C2 -[hidden]d-> W_C3
+    W_C3 -[hidden]d-> W_C4
+}
+
+' ==========================================
+' CAPA MEDIA: Gateways
+' ==========================================
+component "WebAPIGateway" <<gateway>> as WAG
+component "PublicAPIGateway" <<gateway>> as PAG
+
+' ==========================================
+' CAPA INFERIOR: Integración y Otros Microservicios
+' ==========================================
+database "BD\nComponente" as BDComponente
+component "ServicioComponente" <<subsistema>> as ServicioComponente {
+    component "PersistenciaServComponente" <<persistencia>> as ServicioComponente_DB
+    component "TipoComponente" as SSB_TipoComponente
+    component "Componente" as SSB_Componente
+
+    ServicioComponente_DB .u.> SSB_TipoComponente
+    ServicioComponente_DB .u.> BDComponente
+    ServicioComponente_DB .u.> SSB_Componente
+    SSB_Componente .u.> SSB_TipoComponente
+}
+
+database "BD\nContenedor" as BDContenedor
+component "ServicioContenedor" <<subsistema>> as ServicioContenedor {
+    component "PersistenciaServContenedor" <<persistencia>> as ServicioContenedor_DB 
+    component "Contenedor" as SB_Contenedor  
+    component "seguimientoContenedor" as SB_SeguimientoContenedor
+    component "TipoElementos" as SB_TipoElementos
+
+    component "EstadoContenedor" as SB_EstadoContenedor
+    ServicioContenedor_DB .u.> BDContenedor
+    ServicioContenedor_DB .u.> SB_SeguimientoContenedor
+    ServicioContenedor_DB .u.> SB_TipoElementos
+    ServicioContenedor_DB .u.> SB_EstadoContenedor
+    ServicioContenedor_DB .u.> SB_Contenedor
+    SB_Contenedor .u.> SB_EstadoContenedor
+    SB_Contenedor .u.> SB_TipoElementos
+    SB_SeguimientoContenedor .u.> SB_Contenedor
+}
+
+database "BD\nOrdenTraslado" as BDOrdenTraslado
+component "ServicioOrdenTraslado" <<subsistema>> as ServicioOrdenTraslado {
+    component "PersistenciaServOrdenTraslado" <<persistencia>> as ServicioOrdenTraslado_DB 
+    component "OrdenTraslado" as SCM_OrdenTraslado
+    component "LugarOrigen" as SCM_LugarOrigen
+    component "LugarDestino" as SCM_LugarDestino
+    component "FechaArriboDestino" as SCM_FechaArriboDestino
+
+    ServicioOrdenTraslado_DB .u.> SCM_OrdenTraslado
+    ServicioOrdenTraslado_DB .u.> SCM_LugarOrigen
+    ServicioOrdenTraslado_DB .u.> SCM_LugarDestino
+    ServicioOrdenTraslado_DB .u.> BDOrdenTraslado
+    ServicioOrdenTraslado_DB .u.> SCM_FechaArriboDestino
+
+    SCM_OrdenTraslado ..> SCM_LugarOrigen
+    SCM_OrdenTraslado ..> SCM_LugarDestino
+    SCM_OrdenTraslado ..> SCM_FechaArriboDestino
+}
+
+database "BD\nMonoplaza" as BDMonoplaza
+component "ServicioMonoplaza" <<subsistema>> as ServicioMonoplaza {
+    component "PersistenciaServMonoplaza" <<persistencia>> as ServicioMonoplaza_DB
+    component "Monoplaza" as SD_Monoplaza
+    component "Version" as SD_Version
+    ServicioMonoplaza_DB .u.> SD_Monoplaza
+    ServicioMonoplaza_DB .u.> SD_Version
+    SD_Monoplaza ..> SD_Version
+    ServicioMonoplaza_DB ..> BDMonoplaza
+}
+
+database "BD\nEscuderia" as BDEscuderia
+component "ServicioEscuderia" <<subsistema>> as ServicioEscuderia {
+    component "PersistenciaServEscuderia" <<persistencia>> as ServicioEscuderia_DB
+    component "Escuderia" as SR_Escuderia
+    component "Pilotos" as SR_Pilotos
+    ServicioEscuderia_DB .u.> BDEscuderia
+    ServicioEscuderia_DB .u.> SR_Escuderia
+    ServicioEscuderia_DB .u.> SR_Pilotos
+    SR_Escuderia ..> SR_Pilotos
+}
+
+database "BD\nCircuito" as BDCircuito
+component "ServicioCircuito" <<subsistema>> as ServicioCircuito {
+    component "PersistenciaServCircuito" <<persistencia>> as ServicioCircuito_DB
+    component "Circuito" as SR_Circuito
+    component "Sede" as SR_Sede
+    component "Disponibilidad" as SR_Disponibilidad
+    ServicioCircuito_DB .u.> BDCircuito
+    ServicioCircuito_DB .u.> SR_Circuito
+    ServicioCircuito_DB .u.> SR_Sede
+    ServicioCircuito_DB .u.> SR_Disponibilidad
+    SR_Circuito .U.> SR_Sede
+    SR_Circuito .u.> SR_Disponibilidad
+}
+
+database "BD\nUsuarios" as BDUsuarios
+component "ServicioUsuarios" <<subsistema>> as ServicioUsuarios {
+    component "PersistenciaServUsuarios" <<persistencia>> as ServicioUsuarios_DB
+    component "Usuario" as SU_Usuario
+    component "Perfil" as SU_Perfil
+    component "Sesión" as SU_Sesion
+    component "Permiso" as SU_Permiso
+    ServicioUsuarios_DB .u.> BDUsuarios
+    ServicioUsuarios_DB .u.> SU_Permiso
+    ServicioUsuarios_DB .u.> SU_Sesion  
+    ServicioUsuarios_DB .u.> SU_Perfil
+    ServicioUsuarios_DB .u.> SU_Usuario
+    SU_Sesion ..> SU_Usuario
+    SU_Usuario ..> SU_Perfil
+    SU_Perfil ..> SU_Permiso
+}
+
+component "ServicioIntegracionDispositivoGPS" <<subsistema>> as ServicioIntegracionDispositivoGPS
+component "ServicioIntegracionMapa" <<subsistema>> as ServicioIntegracionMapa 
+component "ServicioNotificacionMail" <<subsistema>> as ServicioNotificacionMail 
+
+' ==========================================
+' DISPOSICIÓN EN CUADRÍCULA (GRID LAYOUT)
+' ==========================================
+' Forzar a WAG y PAG a estar en el centro, debajo de WebUI
+WebUI -[hidden]d-> WAG
+WAG -[hidden]r-> PAG
+
+' Forzar a los microservicios a estar en filas inferiores
+WAG -[hidden]d-> ServicioComponente
+PAG -[hidden]d-> ServicioIntegracionDispositivoGPS
+
+' Alinear los microservicios del WAG horizontalmente
+ServicioComponente -[hidden]r-> ServicioContenedor
+ServicioContenedor -[hidden]r-> ServicioOrdenTraslado
+ServicioOrdenTraslado -[hidden]r-> ServicioMonoplaza
+ServicioMonoplaza -[hidden]r-> ServicioEscuderia
+ServicioEscuderia -[hidden]r-> ServicioUsuarios
+ServicioUsuarios -[hidden]r-> ServicioCircuito
+
+' Alinear los microservicios del PAG horizontalmente
+ServicioIntegracionDispositivoGPS -[hidden]r-> ServicioIntegracionMapa
+ServicioIntegracionMapa -[hidden]r-> ServicioNotificacionMail
+
+' ==========================================
+' INTERFACES: Microservicios (Proveen hacia arriba)
+' ==========================================
+interface "IServicioComponente" as SSB_I
+ServicioComponente -u- SSB_I
+
+interface "IServicioContenedor" as SB_I
+ServicioContenedor -u- SB_I
+
+interface "IServicioOrdenTraslado" as SCM_I
+ServicioOrdenTraslado -u- SCM_I
+
+interface "IServicioMonoplaza" as SD_I
+ServicioMonoplaza -u- SD_I
+
+interface "IServicioEscuderia" as SR_I
+ServicioEscuderia -u- SR_I
+
+interface "IServicioCircuito" as SU_Circuito
+ServicioCircuito -u- SU_Circuito
+
+interface "IServicioUsuarios" as SU_I
+ServicioUsuarios -u- SU_I
+
+interface "IServicioIntegracionDispositivoGPS" as SIDG_I
+ServicioIntegracionDispositivoGPS -u- SIDG_I    
+
+interface "IServicioIntegracionMapa" as SIM_I
+ServicioIntegracionMapa -u- SIM_I   
+
+interface "IServicioNotificacionMail" as SNM_I
+ServicioNotificacionMail -u- SNM_I   
+
+' ==========================================
+' INTERFACES: Comunicación WebUI -> WAG
+' ==========================================
+interface "IWebUIRestApi" as WAG_IWU
+' El WAG provee la interfaz hacia arriba
+WAG -u- WAG_IWU
+' La WebUI consume la interfaz hacia abajo
+WebUI -d-( WAG_IWU
+
+' ==========================================
+' INTERFACES: WebApiGateway Lollipops (Consumen hacia abajo)
+' ==========================================
+WAG -d-( SSB_I
+WAG -d-( SB_I
+WAG -d-( SCM_I
+WAG -d-( SD_I
+WAG -d-( SR_I
+WAG -d-( SU_I
+WAG -d-( SU_Circuito
+
+' ==========================================
+' INTERFACES: PublicApiGateway Lollipops (Consumen hacia abajo)
+' ==========================================
+PAG -d-( SIDG_I
+PAG -d-( SIM_I
+PAG -d-( SNM_I
+@enduml

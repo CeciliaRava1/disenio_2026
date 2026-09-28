@@ -1,0 +1,35 @@
+@startuml usecaseDiagram
+left to right direction
+
+actor "Administrador FIA" as AdminFIA
+actor "Creador de OT" as CreadorOT
+actor "Servidor de correo" as SCorreo
+actor "Usuario" as Usuario
+actor "Consultor de mapa de contenedores" as ConsultorMapa
+actor "GPS Tracker" as GPS
+
+usecase "5. Registrar escuderia" as U5
+usecase "6. Modificar escuderia" as U6
+usecase "7. Consultar escuderia" as U7
+usecase "8. Eliminar escuderia" as U8
+usecase "14. Generar orden de traslado" as U14
+usecase "22. Iniciar sesion" as U22
+usecase "19. Monitorear ubicacion de contenedores" as U19
+usecase "24. Emitir reporte de traslados" as U24
+
+AdminFIA --|> Usuario
+CreadorOT --|> Usuario
+ConsultorMapa --|> Usuario
+Usuario --> U22
+
+AdminFIA --> U5
+AdminFIA --> U6
+AdminFIA --> U7
+AdminFIA --> U8
+AdminFIA --> U24
+
+CreadorOT --> U14
+SCorreo --> U14
+ConsultorMapa --> U19
+GPS --> U19
+@enduml
