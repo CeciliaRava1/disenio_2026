@@ -1,0 +1,35 @@
+@startuml VistaDiseñoGlobal
+!theme plain
+skinparam roundcorner 15
+skinparam usecaseBorderColor black
+
+' Definición de colores para los dominios
+skinparam usecase {
+    BackgroundColor<<Core>> #FFC0CB
+    BackgroundColor<<Soporte>> #FFAA33
+    BackgroundColor<<Generico>> #b0a7e7
+}
+
+rectangle "Service Containment Space\nDominios Core" as CoreSpace {
+    usecase "ProyectoDeCultivo" as C1 <<Core>>
+    usecase "Laboreo" as C2 <<Core>>
+}
+
+rectangle "Service Containment Space\nDominios de Soporte" as SupportSpace {
+    usecase "OrdenDeLaboreo" as S1 <<Soporte>>
+    usecase "EstadoProyectoDeCultivo" as S2 <<Soporte>>
+    usecase "Empleado" as S3 <<Soporte>>
+    usecase "Tratamiento" as S4 <<Soporte>>
+    usecase "Campo" as S5 <<Soporte>>
+}
+
+rectangle "Service Containment Space\nDominios Genéricos" as GenericSpace {
+    usecase "Usuarios\ny Accesos" as G1 <<Generico>>
+    usecase "TipoDeSuelo" as G2 <<Generico>>
+    usecase "Formateo datos" as G3 <<Generico>>
+    usecase "UnidadDeMedida" as G4 <<Generico>>
+    usecase "DatosRelevados" as G5 <<Generico>>
+    usecase "Cultivo" as G6 <<Generico>>
+}
+
+@enduml

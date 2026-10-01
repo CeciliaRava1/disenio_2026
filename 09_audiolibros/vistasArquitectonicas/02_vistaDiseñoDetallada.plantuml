@@ -1,0 +1,66 @@
+@startuml DiagramaComponentesArquitectura
+!theme plain
+skinparam componentStyle uml2
+skinparam roundcorner 10
+
+skinparam component {
+    BackgroundColor<<UI Web>> #00FF00
+    BackgroundColor<<Gateway>> #FFFFE0
+    BackgroundColor<<Core>> #FFC0CB
+    BackgroundColor<<Soporte>> #FFAA33
+    BackgroundColor<<Generico>> #8A2BE2
+}
+skinparam databaseBackgroundColor white
+
+' ==========================================
+' CAPA FRONTEND (UI)
+' ==========================================
+component "Aplicación Web" <<UI Web>> as WebApp {
+    component "ModuloCultivosUI" as UICultivo
+}
+
+' ==========================================
+' CAPA API GATEWAY (Patrones)
+' ==========================================
+component "Web API Gateway" <<Gateway>> as APIGateway {
+    portout "CultivoRestAPI" as pCultivoAPI
+}
+
+' ==========================================
+' CAPA MICROSERVICIOS (Back-end)
+' ==========================================
+
+' Ejemplo de un Microservicio CORE
+component "Servicio ProyectoDeCultivo\n<<microservice>>" <<Core>> as MSCultivo {
+    portin " " as inCultivo
+    component "GestorDeProyectos" as LNCultivo
+    component "PersistenciaCultivo" as RepCultivo
+    
+    LNCultivo ..> RepCultivo
+}
+database "BD\nCultivo" as BDCultivo
+
+' Ejemplo de un Microservicio de SOPORTE
+component "Servicio OrdenDeLaboreo\n<<microservice>>" <<Soporte>> as MSLaboreo {
+    portin " " as inLaboreo
+    component "CalculadorLaboreo" as LNLaboreo
+}
+database "BD\nLaboreo" as BDLaboreo
+
+' ==========================================
+' RELACIONES E INTERFACES
+' ==========================================
+' Conexiones de UI a Gateway
+WebApp ---> APIGateway : "Peticiones HTTP"
+
+' Conexiones de Gateway a Microservicios
+pCultivoAPI ---> inCultivo : "Enruta a"
+
+' Dependencias a Base de datos
+RepCultivo ---> BDCultivo
+MSLaboreo ---> BDLaboreo
+
+' Comunicación entre microservicios (Ejemplo)
+MSCultivo ...> inLaboreo : "Consume API"
+
+@enduml
