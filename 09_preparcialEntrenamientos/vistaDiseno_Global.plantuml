@@ -1,0 +1,103 @@
+@startuml vistaDiseno_Global
+title Vista de Diseño global
+
+left to right direction
+skinparam componentStyle rectangle
+
+skinparam component {
+  BackgroundColor<<gateway>> #85C1E9
+  BackgroundColor<<microservicio>> #FADBD8
+  BackgroundColor<<subsistema>> #F8F9F9
+  BorderColor Black
+}
+
+skinparam database {
+  BackgroundColor White
+  BorderColor Black
+}
+
+skinparam rectangle {
+  BackgroundColor transparent
+  BorderColor Black
+}
+
+' ==========================================
+' CAPA 1: Interfaces y Sistemas Externos
+' ==========================================
+component "WebUI" as WebUI <<subsistema>>
+
+rectangle "Externos" as SistemasExternos {
+  component "ServicioLocalizacionGPS" as ServicioLocalizacionGPS
+  component "ServicioMapa" as ServicioMapa
+  component "ServicioInstagram" as ServicioInstagram
+  component "ServicioLogMeal" as ServicioLogMeal
+
+}
+
+' ==========================================
+' CAPA 2: Gateways (Enrutamiento)
+' ==========================================
+component "WebAPIGateway" as WebGateway <<gateway>>
+component "PublicAPIGateway" as PublicGateway <<gateway>>
+' ==========================================
+' CAPA 3: Microservicios y Bases de Datos
+' ==========================================
+component "ServicioMetaEntrenamiento" as SVC_MetaEntrenamiento <<microservicio>>
+database "BD\nMetaEntrenamiento" as DB_MetaEntrenamiento
+
+component "ServicioAlimentacion" as SVC_Alimentacion <<microservicio>>
+database "BD\nAlimentacion" as DB_Alimentacion
+
+component "ServicioOrdenTraslado" as SVC_OrdenTraslado <<microservicio>>
+database "BD\nOrdenTraslado" as DB_OrdenTraslado
+
+component "ServicioMonoplaza" as SVC_Monoplaza <<microservicio>>
+database "BD\nMonoplaza" as DB_Monoplaza
+
+component "ServicioCircuito" as SVC_Circuito <<microservicio>>
+database "BD\nCircuito" as DB_Circuito
+
+component "ServicioUsuarios" as SVC_Usuarios <<microservicio>>
+database "BD\nUsuarios" as DB_Usuarios
+
+component "IntegracionLocalizacionGPS" as SVC_LocalizacionGPS <<microservicio>>
+component "IntegracionMapa" as SVC_IntegracionMapa <<microservicio>>
+component "IntegracionNotificacionMail" as SVC_NotificacionMail <<microservicio>>
+component "IntegracionInstagram" as SVC_IntegracionInstagram <<microservicio>>
+
+
+' ==========================================
+' RELACIONES: Acoplamiento de Bases de Datos
+' ==========================================
+' Se usa una línea sin flecha para denotar que la BD pertenece al servicio
+SVC_MetaEntrenamiento - DB_MetaEntrenamiento
+SVC_OrdenTraslado - DB_OrdenTraslado
+SVC_Monoplaza - DB_Monoplaza
+SVC_Alimentacion - DB_Alimentacion
+SVC_Usuarios - DB_Usuarios
+SVC_Circuito - DB_Circuito
+SVC_Componente - DB_Componente
+
+' ==========================================
+' RELACIONES: Flujo de solicitudes
+' ==========================================
+' Entradas a los Gateways
+WebUI ---> WebGateway
+ServicioLocalizacionGPS ---> PublicGateway
+ServicioMapa ---> PublicGateway
+ServicioInstagram ---> PublicGateway
+
+' Distribución desde WebAPIGateway
+WebGateway ---> SVC_MetaEntrenamiento
+WebGateway ---> SVC_OrdenTraslado
+WebGateway ---> SVC_Monoplaza
+WebGateway ---> SVC_Alimentacion
+WebGateway ---> SVC_Circuito
+WebGateway ---> SVC_Usuarios
+WebGateway ---> SVC_Componente
+
+' Distribución desde PublicAPIGateway
+PublicGateway --> SVC_LocalizacionGPS
+PublicGateway --> SVC_IntegracionMapa
+PublicGateway --> SVC_IntegracionInstagram
+@enduml

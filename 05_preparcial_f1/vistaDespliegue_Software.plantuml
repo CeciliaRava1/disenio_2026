@@ -10,12 +10,29 @@ node "ClienteWebResponsive" <<web client>> as ClienteWebResponsive {
   component ":Explorador" <<executable>>
 }
 
-node "Servidor Web y de Aplicaciones" as SRV {
+node "GPSTracker" <<web client>> as GPSTracker {
+  component ":ServidorGPS" <<executable>>
+}
+
+node "ServidorCorreo" <<web client>> as ServicioCorreo {
+  component ":ServicioCorreo" <<executable>>
+}
+
+node "ServicioGoogleMaps" <<web client>> as ServicioGoogleMaps {
+  component ":ServicioGoogleMaps" <<executable>>
+}
+
+node "ServidorBDEspejada" <<web client>> as ServidorBDEspejada {
+  database ":BD\nBaseDeDatosEspejada" as ServidorBDEspejada_DB
+}
+
+node "Servidor Web en la Nube" as SRV {
   component "WebAPIGateway" <<gateway>> as WAG
   component "PublicAPIGateway" <<gateway>> as PAG
   component "WebServer" <<executable>> as WebServer
   component "WebUI" <<subsistema>> as WebUI
-  
+  component "Interfaz" <<executable>> as Interfaz
+
   database "BD\nEscuderia" as BDEscuderia
   component "ServicioEscuderia" <<microservicio>> as ServicioEscuderia
 
@@ -46,5 +63,12 @@ node "Servidor Web y de Aplicaciones" as SRV {
   ServicioComponente .u.> BDComponente
 }
 ClienteWebResponsive      -- SRV
-
+GPSTracker                -- SRV
+ServicioCorreo            -- SRV
+ServicioGoogleMaps        -- SRV
+ServidorBDEspejada        -- SRV
 @enduml
+
+' Los nodos se dibujan con profundidad 3D porque sino se confunde con un componente
+' El nombre del componente base debe decir que es en la nube si lo es en negrita
+'si espejo todas las bases de datos agrego un nodo y uso una sola
