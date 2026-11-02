@@ -1,0 +1,39 @@
+' Contexto: Turno
+' Delegacion a estado actual: Hecha por el turno quien le delega al estado actual lo que debe hacer
+@startuml DiagramaSecuencia
+
+autonumber
+
+control GestionAusencias AS GestionAusencias
+control GestorAusenciaProfesional AS GestorAusenciaProfesional
+entity Turno AS Turno
+entity Solicitado as Solicitado
+entity CambioEstado AS CambioEstado
+entity EstadoTurno AS EstadoTurno
+entity Paciente AS Paciente
+entity Cancelado AS Cancelado
+entity nuevoCambioEstado AS NuevoCambioEstado
+
+' Metodo de enganche
+GestionAusencias-> GestorAusenciaProfesional: tomarConfirmacion() 
+' Etiqueta: Los metodos entre tomar confirmacion y cancelar permanecen iguales que en el analisis
+GestorAusenciaProfesional-> GestorAusenciaProfesional: cancelarTurnos(turnos[])
+GestorAusenciaProfesional-> GestorAusenciaProfesional: getFecha(): DateTime
+
+group cancelarTurnos [mientras haya turnos]
+    GestorAusenciaProfesional-> Turno: cancelar()
+    ' Se pasan los cambios de estado porque solicitado no los conoce, y necesita buscar el ultimo para setearle su horaFin
+    ' Debo pasar el paciente porque le tiene que aumentar el contador de cancelaciones. En todos los casos hay visibilidad por parametros, que luego en la estructura se ve con la relacion dependencia
+    Turno -> Solicitado: cancelar(turno: Turno, motivo: Motivo, fecha: DateTime, cambioEstado: CambioEstado[], paciente: Paciente)
+    Solicitado -> Solicitado: sumarCancelacionPaciente()
+    Solicitado -> Paciente: actualizarCantCancelaciones(cant: int): void
+    Paciente -> Paciente: setCantCancelaciones(cant: int)
+
+    Solicitado -> CambioEstado: sosActual*()
+    Solicitado -> Solicitado: crearEstado(): void
+    Solicitado -> Cancelado: new(): void
+    
+
+
+
+@enduml

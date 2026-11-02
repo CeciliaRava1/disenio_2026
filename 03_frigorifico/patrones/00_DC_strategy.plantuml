@@ -1,0 +1,91 @@
+
+
+
+' BORRADOR
+@startuml classDiagram
+
+GestorAusenciaProfesional --> Turno : Turno
+
+Turno --> "1" EstadoTurno : EstadoTurno
+Disponible -|> EstadoTurno
+Solicitado -|> EstadoTurno
+Cancelado -|> EstadoTurno
+Ocupado -|> EstadoTurno
+NoDisponible -|> EstadoTurno
+Asistido -|> EstadoTurno
+NoAsistido -|> EstadoTurno
+
+
+class GestorAusenciaProfesional {
+    + fechaActual: Date
+
+    + generarTurnos(): void
+    + getFechaHora(): DateTime
+    + tomarConfirmacion(): void
+}
+
+class Turno {
+    + dia: Date
+    + horaFinEsperada: Time
+    + horaInicio: Time
+
+    + cancelar(): void
+    + confirmar(): void
+    + estasDentroRango(): boolean
+    + estasDisponible(): boolean
+    + getDatos(): String
+    + liberar(): void
+    + noDisponible(): void
+    + obtenerContactoPac(): String
+    + pacienteNoPresente(): void
+    + pacientePresente(): void
+    + pendiente(): void
+    + sePuedeCancelar(): boolean
+    + solicitar(): void
+    + sumarCancelacionPaciente(): void
+    + verificarAsistencia(): void
+    + verificarDiaTurno(): void
+}
+
+class EstadoTurno {
+    + descripcion: String
+    + nombre: String
+
+    + getNombre(): String
+    + sosCancelado(): boolean
+    + sosDisponible(): boolean
+    + sosSolicitado(): boolean
+}
+
+class Disponible {
+    + new()
+}
+
+class Solicitado {
+    + solicitar() : Solicitado
+    + verificarDiaTUrno() : Solicitado
+}
+
+class Cancelado {
+    + cancelar() : Cancelado
+}
+
+class Ocupado {
+    + new() : Ocupado
+    + liberar: void
+    + verificarAsistencia() : void
+}
+
+class NoDisponible {
+    + new() : NoDisponible
+}
+
+class Asistido {
+    + new() : Asistido
+}
+
+class NoAsistido {
+    + new() : NoAsistido
+}
+
+@enduml
