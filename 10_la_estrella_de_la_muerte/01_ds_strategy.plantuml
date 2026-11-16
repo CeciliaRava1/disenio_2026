@@ -1,0 +1,74 @@
+@startuml diagramaClase
+
+autonumber
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+' --- CLASES DE ANALISIS ---
+actor Oficial as ":Oficial"
+boundary Pantalla as ":PantallaInformeCumplimientoOR"
+control Gestor as ":GestorInformeCumplimientoOR"
+
+' --- CLASES DE FABRICACION PURA ---
+entity IEstrategiaA as "IEstrategiaA"
+
+' --- CLASES DEL DOMINIO ---
+entity BaseMilitar as "BaseMilitar" #ee7829
+entity OrdenReubicacion as "OrdenReubicacion" #ee7829
+entity CambioEstado as "CambioEstado" #ee7829
+entity ACambioEstado as "Actual:CambioEstado"
+entity DELCambio as "Del:CambioEstado"
+entity ActualSesion as "Actual:Sesion"
+entity Soldado as ":Soldado" #ee7829
+entity LSoldado as "Logueado:Soldado" 
+
+
+'8. Oficial: Selecciona el método de porcentaje de ejecución satisfactorio por base militar de origen.
+Oficial -> Pantalla : tomarSeleccionMetodoCalculo()
+Pantalla -> Gestor : tomarMetodoCalculo()
+
+'9. Sistema: Solicita confirmación para generar el informe.
+Gestor -> Pantalla : solicitarConfirmacion()
+
+'10. Oficial: Confirma la generación del informe.
+Oficial -> Pantalla : tomarConfirmacion()
+Pantalla -> Gestor : tomarConfirmacion()
+Gestor -> Gestor : crearEstrategia()
+Gestor --> IEstrategiaA : new()
+Gestor -> IEstrategiaA : calcularEjecucionesOR()
+
+'11. Sistema: Busca para cada base militar seleccionada todas las Órdenes de Reubicación que se hayan creado dentro 
+'del periodo seleccionado.
+group Recorre bases militares seleccionadas [ mientras haya bases militares seleccionadas ]
+    IEstrategiaA -> IEstrategiaA : obtenerORDeBaseMilitar()\
+
+    group OR Creadas [ mientras existan OR ]
+        IEstrategiaA -> OrdenReubicacion : esDeBaseMilitar()
+        IEstrategiaA -> OrdenReubicacion : determinarFechaCreacion()
+        OrdenReubicacion -> CambioEstado : *getFechaHoraDesde()
+
+'12. Sistema: Busca para cada base militar seleccionada todas las Órdenes de Reubicación que se hayan creado dentro 
+'del periodo seleccionado y cuyo estado actual sea Ejecutada Satisfactoriamente.
+        IEstrategiaA -> OrdenReubicacion : estaEnPeriodo()
+    end
+
+    IEstrategiaA -> IEstrategiaA : calcularCantidadOR()
+    IEstrategiaA -> IEstrategiaA : contarORSatisfactoriaDeBaseMilitar()
+
+    group OR Ejecutadas satisfactoriamente [ mientras existan OR ]
+        IEstrategiaA -> OrdenReubicacion : estaEjecutadaSatisfactoriamente()
+        OrdenReubicacion -> CambioEstado : *esActual()
+        OrdenReubicacion -> ACambioEstado : esEjecutadaSatisfactoriamente()
+        ACambioEstado -> DELCambio : esEjecutadaSatisfactoriamente()
+    end 
+end
+
+'13. Sistema: Calcula por cada base seleccionada el porcentaje de ejecución satisfactoria de órdenes de reubicación.
+IEstrategiaA -> IEstrategiaA : calcularEjecucionesPorBasesMilitares()
+IEstrategiaA -> Gestor : retornarEjecucionesPorBasesMilitares()
+'14. Sistema: Solicita que se selecciona una forma de visualización del reporte. (Ver Observación 2)
+'15. Oficial: Selecciona exportar a PDF.
+'16. Sistema: Genera el informe en formato PDF. (Ver Observación 3). Fin del CU.
+
+@enduml
