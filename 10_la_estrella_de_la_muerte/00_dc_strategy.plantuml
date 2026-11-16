@@ -1,0 +1,76 @@
+@startuml DiagramaClasesDominio
+skinparam style strictuml
+skinparam linetype ortho
+
+' --- CLASES DE ANALISIS ---
+class PantallaInformeCumplimientoOR {
+    + tomarSeleccionMetodoCalculo()
+    + solicitarConfirmacion()
+    + tomarConfirmacion()
+}
+
+class GestorInformeCumplimientoOR {
+    + tomarMetodoCalculo()
+    + tomarConfirmacion()
+    + crearEstrategia()
+    + retornarEjecucionesPorBasesMilitares()
+}
+
+class IEstrategiaCalculo {
+
+}
+
+class EstrategiaEjecucionSatisfactoria {
+    + new()
+    + calcularEjecucionesOR(basesSeleccionadas: List<BaseMilitar>, fechaDesde: DateTime, fechaHasta: DateTime): Float
+    + obtenerORDeBaseMilitar()
+    + calcularCantidadOR()
+    + contarORSatisfactoriaDeBaseMilitar()
+    + calcularEjecucionesPorBasesMilitares()
+
+}
+
+class EstrategiaOREjecutadas {
+
+}
+
+class EstrategiaORNoEjecutadas {
+
+}
+
+' --- ENTIDADES ---
+class BaseMilitar {
+    + nombre
+
+}
+
+class OrdenReubicacion {
+    + esDeBaseMilitar(baseMilitar: BaseMilitar): Boolean
+    + determinarFechaCreacion()
+    + estaEnPeriodo(fechaDesde: DateTime, fechaHasta: DateTime): Boolean
+    + estaEjecutadaSatisfactoriamente()
+}
+
+class CambioEstado {
+    + fechaHoraDesde
+    + fechaHoraHasta
+
+    + getFechaHoraDesde()
+    + esActual()
+    + esEjecutadaSatisfactoriamente()
+
+}
+
+
+' --- RELACIONES ---
+EstrategiaEjecucionSatisfactoria --|> IEstrategiaCalculo
+EstrategiaOREjecutadas --|> IEstrategiaCalculo
+EstrategiaORNoEjecutadas --|> IEstrategiaCalculo
+
+PantallaInformeCumplimientoOR ..> GestorInformeCumplimientoOR
+GestorInformeCumplimientoOR ..> PantallaInformeCumplimientoOR
+
+EstrategiaEjecucionSatisfactoria --> BaseMilitar
+EstrategiaEjecucionSatisfactoria --> OrdenReubicacion
+OrdenReubicacion --> CambioEstado
+@enduml
