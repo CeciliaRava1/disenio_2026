@@ -18,24 +18,4 @@ AdaptadorSENASA -> AdaptadorSENASA : getFechaActual(): DateTime
 AdaptadorSENASA -> ServicioSENASA : consultarDeuda(dni: String, fecha: DateTime): String
 AdaptadorSENASA -> AdaptadorSENASA : adaptarCodigoPago()
 AdaptadorSENASA --> InterfazConsultaDeudores : retornarCodigoPago(): Int
-
-'9. Sistema: Calcula y muestra el monto a abonar correspondiente, para lo cual calcula la cantidad de dias de atraso en funcion de la fecha de vencimiento de la cuota y la fecha actual. Calcula el recargo aplicable en funcion de la definicion de mora asociada al tipo de prestamo
-'10: Sistema: Solicita confirmacion al cliente
-'11: Cliente: Confirma el pago de la cuota
-'12: Sistema: Llama al caso de uso registrar pago para realizar y registrar el pago de la cuota, enviando el monto a pagar. Informa ejecucion exitosa del caso de uso
-
-
-
-
 @enduml
-
-
-
-
-
-'7. Sistema: Obtiene el estado de la cuota seleccionada y la cuota esta vencida. Valida si el prestamo esta marcado como cobro por ente externo y es asi. El ente de cobro externo corresponde a SENADA.
-'8. Sistema: Obtiene del servicio SENASA el codigo de pago correspondiente al prestamo seleccionado
-'9. Sistema: Calcula y muestra el monto a abonar correspondiente, para lo cual calcula la cantidad de dias de atraso en funcion de la fecha de vencimiento de la cuota y la fecha actual. Calcula el recargo aplicable en funcion de la definicion de mora asociada al tipo de prestamo
-'10: Sistema: Solicita confirmacion al cliente
-'11: Cliente: Confirma el pago de la cuota
-'12: Sistema: Llama al caso de uso registrar pago para realizar y registrar el pago de la cuota, enviando el monto a pagar. Informa ejecucion exitosa del caso de uso

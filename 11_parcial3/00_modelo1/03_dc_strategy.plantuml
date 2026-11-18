@@ -2,93 +2,54 @@
 skinparam style strictuml
 skinparam linetype ortho
 
-' --- CLASES DE ANALISIS ---
-class PantallaInformeCumplimientoOR {
-    + basesMilitaresSeleccionadas: BaseMilitar[]
-    + fechaDesde: DateTime
-    + fechaHasta: DateTime
-    + estrategiaSeleccionada: IEstrategia
+class GestorRegistrarPagoCuota {
+    + montoBase: float
+    + prestamoSel: Prestamo
+    + montoAAbonar: float
 
-    + tomarSeleccionMetodoCalculo()
-    + solicitarConfirmacion()
-    + tomarConfirmacion()
-}
-
-class GestorInformeCumplimientoOR {
-    + basesMilitaresSeleccionadas: BaseMilitar[]
-    + fechaDesde: DateTime
-    + fechaHasta: DateTime
-    + estrategiaSeleccionada: IEstrategia
-
-    + tomarMetodoCalculo()
-    + tomarConfirmacion()
+    + calcularMontoAAbonar(montoBase: float, prestamo: Prestamo): float
     + crearEstrategia()
-    + calcularEjecucionesOR()
-    + retornarEjecucionesPorBasesMilitares()
+    + retornarMontoAAbonar(): float
 }
 
-class IEstrategiaCalculo {
-    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
+class IEstrategiaCalculoMora {
+    + calcularMontoAAbonar(montoBase: float, prestamo: Prestamo): float
+
 }
 
-class EstrategiaEjecucionSatisfactoria {
+class EstrategiaCalculoPorcentual {
     + new()
-    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
-    + obtenerORDeBaseMilitar(baseMilitar: BaseMilitar, fechaDesde: DateTime, fechaHasta: DateTime)
-    + calcularCantidadOR()
-    + contarORSatisfactoriaDeBaseMilitar()
-    + calcularEjecucionesPorBasesMilitares()
+    + calcularMontoAAbonar(montoBase: float, prestamo: Prestamo): float
+    + getFechaActual(): Date
 
 }
 
-class EstrategiaOREjecutadas {
-    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
-}
-
-class EstrategiaORNoEjecutadas {
-    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
-}
-
-' --- ENTIDADES ---
-class BaseMilitar {
-    + nombre
+class EstrategiaCalculoFijo {
+    + new()
+    + calcularMontoAAbonar(montoBase: float, prestamo: Prestamo): float
 
 }
 
-class OrdenReubicacion {
-    + esDeBaseMilitar(baseMilitar: BaseMilitar): Boolean
-    + determinarFechaCreacion(): DateTime
-    + estaEnPeriodo(fechaDesde: DateTime, fechaHasta: DateTime): Boolean
-    + estaEjecutadaSatisfactoriamente()
+class Prestamo {
+    + obtenerParametrosMora(): String[]
+    
 }
 
-class CambioEstado {
-    + fechaHoraDesde
-    + fechaHoraHasta
-
-    + getFechaHoraDesde(): DateTime
-    + esActual()
-    + esEjecutadaSatisfactoriamente()
-
+class TipoPrestamo {
+    + nombre: String
+    
 }
 
-class Estado {
-    + nombre
-    + descripcion
+class DefinicionMora {
+    + porcentajeRecargo: float
 }
 
-
-' --- RELACIONES ---
-EstrategiaEjecucionSatisfactoria --|> IEstrategiaCalculo
-EstrategiaOREjecutadas --|> IEstrategiaCalculo
-EstrategiaORNoEjecutadas --|> IEstrategiaCalculo
-
-PantallaInformeCumplimientoOR ..> GestorInformeCumplimientoOR
-GestorInformeCumplimientoOR ..> PantallaInformeCumplimientoOR
-GestorInformeCumplimientoOR -> IEstrategiaCalculo
-
-EstrategiaEjecucionSatisfactoria --> BaseMilitar
-EstrategiaEjecucionSatisfactoria --> OrdenReubicacion
-OrdenReubicacion --> CambioEstado
-CambioEstado -> Estado
+GestorRegistrarPagoCuota .> IEstrategiaCalculoMora
+GestorRegistrarPagoCuota .> DefinicionMora
+GestorRegistrarPagoCuota .> Prestamo
+Prestamo -> TipoPrestamo
+TipoPrestamo -> DefinicionMora
+EstrategiaCalculoPorcentual .|> IEstrategiaCalculoMora
+EstrategiaCalculoFijo .|> IEstrategiaCalculoMora
+EstrategiaCalculoPorcentual -> DefinicionMora
 @enduml
