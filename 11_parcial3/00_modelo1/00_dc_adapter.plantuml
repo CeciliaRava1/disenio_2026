@@ -2,93 +2,57 @@
 skinparam style strictuml
 skinparam linetype ortho
 
-' --- CLASES DE ANALISIS ---
-class PantallaInformeCumplimientoOR {
-    + basesMilitaresSeleccionadas: BaseMilitar[]
-    + fechaDesde: DateTime
-    + fechaHasta: DateTime
-    + estrategiaSeleccionada: IEstrategia
 
-    + tomarSeleccionMetodoCalculo()
-    + solicitarConfirmacion()
-    + tomarConfirmacion()
+class GestorRegistrarPagoCuota {
+    + dni: Int
+    + fecha: DateTime
+    + prestamoSeleccionado: Prestamo
 }
 
-class GestorInformeCumplimientoOR {
-    + basesMilitaresSeleccionadas: BaseMilitar[]
-    + fechaDesde: DateTime
-    + fechaHasta: DateTime
-    + estrategiaSeleccionada: IEstrategia
-
-    + tomarMetodoCalculo()
-    + tomarConfirmacion()
-    + crearEstrategia()
-    + calcularEjecucionesOR()
-    + retornarEjecucionesPorBasesMilitares()
+class IAdaptadorCentralDeudores {
+    + obtenerCodigoPago(dni: String, fecha: DateTime): Int
 }
 
-class IEstrategiaCalculo {
-    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
-}
+class AdaptadorSENASA {
+    + codigoPago: int
+    + fecha: DateTime
 
-class EstrategiaEjecucionSatisfactoria {
     + new()
-    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
-    + obtenerORDeBaseMilitar(baseMilitar: BaseMilitar, fechaDesde: DateTime, fechaHasta: DateTime)
-    + calcularCantidadOR()
-    + contarORSatisfactoriaDeBaseMilitar()
-    + calcularEjecucionesPorBasesMilitares()
-
+    + obtenerCodigoPago(dni: String, fecha: DateTime): Int
+    + getFechaActual(): DateTime
+    + adaptarCodigoPago()
 }
 
-class EstrategiaOREjecutadas {
-    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
+class AdaptadorAGIP {
+    + new()
+    + obtenerCodigoPago(dni: String, fecha: DateTime): Int
 }
 
-class EstrategiaORNoEjecutadas {
-    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
+class ServicioSENASA {
+    + consultarDeuda(dni: String, fecha: DateTime): String
+    
 }
 
-' --- ENTIDADES ---
-class BaseMilitar {
-    + nombre
-
+class ServicioAGIP {
+    
 }
 
-class OrdenReubicacion {
-    + esDeBaseMilitar(baseMilitar: BaseMilitar): Boolean
-    + determinarFechaCreacion(): DateTime
-    + estaEnPeriodo(fechaDesde: DateTime, fechaHasta: DateTime): Boolean
-    + estaEjecutadaSatisfactoriamente()
+class Prestamo {
+    + nro: Int
 }
 
-class CambioEstado {
-    + fechaHoraDesde
-    + fechaHoraHasta
-
-    + getFechaHoraDesde(): DateTime
-    + esActual()
-    + esEjecutadaSatisfactoriamente()
-
+class Cliente {
+    + dni: Int
 }
 
-class Estado {
-    + nombre
-    + descripcion
-}
+GestorRegistrarPagoCuota -> IAdaptadorCentralDeudores
+AdaptadorSENASA -|> IAdaptadorCentralDeudores
+AdaptadorAGIP -|> IAdaptadorCentralDeudores
+ServicioSENASA o-> AdaptadorSENASA
+ServicioAGIP o-> AdaptadorAGIP
+GestorRegistrarPagoCuota -> Cliente
+GestorRegistrarPagoCuota -> Prestamo
 
 
-' --- RELACIONES ---
-EstrategiaEjecucionSatisfactoria --|> IEstrategiaCalculo
-EstrategiaOREjecutadas --|> IEstrategiaCalculo
-EstrategiaORNoEjecutadas --|> IEstrategiaCalculo
 
-PantallaInformeCumplimientoOR ..> GestorInformeCumplimientoOR
-GestorInformeCumplimientoOR ..> PantallaInformeCumplimientoOR
-GestorInformeCumplimientoOR -> IEstrategiaCalculo
-
-EstrategiaEjecucionSatisfactoria --> BaseMilitar
-EstrategiaEjecucionSatisfactoria --> OrdenReubicacion
-OrdenReubicacion --> CambioEstado
-CambioEstado -> Estado
 @enduml
