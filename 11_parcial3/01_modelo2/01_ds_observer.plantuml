@@ -1,0 +1,71 @@
+@startuml diagramaSecuencia
+
+autonumber
+skinparam style strictuml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+' --- CLASES DE ANALISIS ---
+actor Oficial as ":Oficial"
+boundary Pantalla as ":PantallaInformeCumplimientoOR"
+control Gestor as ":GestorInformeCumplimientoOR"
+
+' --- CLASES DE FABRICACION PURA ---
+participant EstrategiaEjecucionSatisfactoria as ":EstrategiaEjecucionSatisfactoria"
+
+' --- CLASES DEL DOMINIO ---
+entity BaseMilitar as "BaseMilitar" #ee7829
+entity OrdenReubicacion as "OrdenReubicacion" #ee7829
+entity CambioEstado as "CambioEstado" #ee7829
+entity ACambioEstado as "Actual:CambioEstado"
+entity Estado as "Estado"
+
+'8. Oficial: Selecciona el método de porcentaje de ejecución satisfactorio por base militar de origen.
+Oficial -> Pantalla : tomarSeleccionMetodoCalculo()
+Pantalla -> Gestor : tomarMetodoCalculo()
+
+'9. Sistema: Solicita confirmación para generar el informe.
+Gestor -> Pantalla : solicitarConfirmacion()
+
+'10. Oficial: Confirma la generación del informe.
+Oficial -> Pantalla : tomarConfirmacion()
+Pantalla -> Gestor : tomarConfirmacion()
+Gestor -> Gestor : crearEstrategia()
+Gestor --> EstrategiaEjecucionSatisfactoria : new()
+Gestor -> Gestor : calcularEjecucionesOR()
+Gestor -> EstrategiaEjecucionSatisfactoria : calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
+
+'11. Sistema: Busca para cada base militar seleccionada todas las Órdenes de Reubicación que se hayan creado dentro 
+'del periodo seleccionado.
+group Recorre bases militares seleccionadas [ mientras haya bases militares seleccionadas ]
+    EstrategiaEjecucionSatisfactoria -> EstrategiaEjecucionSatisfactoria : obtenerORDeBaseMilitar(baseMilitar: BaseMilitar, fechaDesde: DateTime, fechaHasta: DateTime)
+
+    group OR Creadas [ mientras existan OR ]
+        EstrategiaEjecucionSatisfactoria -> OrdenReubicacion : esDeBaseMilitar(baseMilitar: BaseMilitar): Boolean
+        EstrategiaEjecucionSatisfactoria -> OrdenReubicacion : determinarFechaCreacion(): DateTime
+        OrdenReubicacion -> CambioEstado : *getFechaHoraDesde(): DateTime
+
+'12. Sistema: Busca para cada base militar seleccionada todas las Órdenes de Reubicación que se hayan creado dentro 
+'del periodo seleccionado y cuyo estado actual sea Ejecutada Satisfactoriamente.
+        EstrategiaEjecucionSatisfactoria -> OrdenReubicacion : estaEnPeriodo(fechaDesde: DateTime, fechaHasta: DateTime): Boolean
+    end
+
+    EstrategiaEjecucionSatisfactoria -> EstrategiaEjecucionSatisfactoria : calcularCantidadOR(ordenesDelPeriodo: OrdenReubicacion[]): int
+    EstrategiaEjecucionSatisfactoria -> EstrategiaEjecucionSatisfactoria : contarORSatisfactoriaDeBaseMilitar(ordenesDelPeriodo: OrdenReubicacion[]): int
+
+    group OR Ejecutadas satisfactoriamente [ mientras existan OR ]
+        EstrategiaEjecucionSatisfactoria -> OrdenReubicacion : estaEjecutadaSatisfactoriamente(): boolean
+        OrdenReubicacion -> CambioEstado : *esActual(): boolean
+        OrdenReubicacion -> ACambioEstado : esEjecutadaSatisfactoriamente(): boolean
+        ACambioEstado -> Estado : esEjecutadaSatisfactoriamente(): boolean
+    end 
+end
+
+'13. Sistema: Calcula por cada base seleccionada el porcentaje de ejecución satisfactoria de órdenes de reubicación.
+EstrategiaEjecucionSatisfactoria -> EstrategiaEjecucionSatisfactoria : calcularEjecucionesPorBasesMilitares(ORCreadas: int[], ORSatisfactorias: int[], basesMilitares: String[]): String[][]
+PantallaInformeCumplimientoOR -> GestorInformeCumplimientoOR : solicitarSelFormaVisualiacion()
+'14. Sistema: Solicita que se selecciona una forma de visualización del reporte. (Ver Observación 2)
+'15. Oficial: Selecciona exportar a PDF.
+'16. Sistema: Genera el informe en formato PDF. (Ver Observación 3). Fin del CU.
+
+@enduml

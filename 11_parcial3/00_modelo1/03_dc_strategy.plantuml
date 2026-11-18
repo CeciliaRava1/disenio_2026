@@ -1,0 +1,94 @@
+@startuml DiagramaClases
+skinparam style strictuml
+skinparam linetype ortho
+
+' --- CLASES DE ANALISIS ---
+class PantallaInformeCumplimientoOR {
+    + basesMilitaresSeleccionadas: BaseMilitar[]
+    + fechaDesde: DateTime
+    + fechaHasta: DateTime
+    + estrategiaSeleccionada: IEstrategia
+
+    + tomarSeleccionMetodoCalculo()
+    + solicitarConfirmacion()
+    + tomarConfirmacion()
+}
+
+class GestorInformeCumplimientoOR {
+    + basesMilitaresSeleccionadas: BaseMilitar[]
+    + fechaDesde: DateTime
+    + fechaHasta: DateTime
+    + estrategiaSeleccionada: IEstrategia
+
+    + tomarMetodoCalculo()
+    + tomarConfirmacion()
+    + crearEstrategia()
+    + calcularEjecucionesOR()
+    + retornarEjecucionesPorBasesMilitares()
+}
+
+class IEstrategiaCalculo {
+    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
+}
+
+class EstrategiaEjecucionSatisfactoria {
+    + new()
+    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
+    + obtenerORDeBaseMilitar(baseMilitar: BaseMilitar, fechaDesde: DateTime, fechaHasta: DateTime)
+    + calcularCantidadOR()
+    + contarORSatisfactoriaDeBaseMilitar()
+    + calcularEjecucionesPorBasesMilitares()
+
+}
+
+class EstrategiaOREjecutadas {
+    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
+}
+
+class EstrategiaORNoEjecutadas {
+    + calcularEjecucionesOR(ordenesReubicacion: OrdenReubicacion[], basesSeleccionadas: BaseMilitar[], fechaDesde: DateTime, fechaHasta: DateTime): String[][]
+}
+
+' --- ENTIDADES ---
+class BaseMilitar {
+    + nombre
+
+}
+
+class OrdenReubicacion {
+    + esDeBaseMilitar(baseMilitar: BaseMilitar): Boolean
+    + determinarFechaCreacion(): DateTime
+    + estaEnPeriodo(fechaDesde: DateTime, fechaHasta: DateTime): Boolean
+    + estaEjecutadaSatisfactoriamente()
+}
+
+class CambioEstado {
+    + fechaHoraDesde
+    + fechaHoraHasta
+
+    + getFechaHoraDesde(): DateTime
+    + esActual()
+    + esEjecutadaSatisfactoriamente()
+
+}
+
+class Estado {
+    + nombre
+    + descripcion
+}
+
+
+' --- RELACIONES ---
+EstrategiaEjecucionSatisfactoria --|> IEstrategiaCalculo
+EstrategiaOREjecutadas --|> IEstrategiaCalculo
+EstrategiaORNoEjecutadas --|> IEstrategiaCalculo
+
+PantallaInformeCumplimientoOR ..> GestorInformeCumplimientoOR
+GestorInformeCumplimientoOR ..> PantallaInformeCumplimientoOR
+GestorInformeCumplimientoOR -> IEstrategiaCalculo
+
+EstrategiaEjecucionSatisfactoria --> BaseMilitar
+EstrategiaEjecucionSatisfactoria --> OrdenReubicacion
+OrdenReubicacion --> CambioEstado
+CambioEstado -> Estado
+@enduml
